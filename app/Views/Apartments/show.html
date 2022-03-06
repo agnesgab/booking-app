@@ -1,0 +1,13 @@
+<a href="/index">Back</a>
+
+<div>
+    <h1>{{ apartment.name }}</h1>
+    <p>{{ apartment.description }}</p>
+    <ul>
+        <li>Available from: {{ apartment.availableFrom}}</li>
+        <li>Available to: {{ apartment.availableTo }}</li>
+    </ul>
+
+    <form method="get" name="book" action="/book/{{ apartment.id }}"><button type="submit">BOOK</button></form>
+
+</div>

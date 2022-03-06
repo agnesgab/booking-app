@@ -1,0 +1,13 @@
+<div >
+    <h1>New reservation</h1>
+    <h2>{{ apartment.name }}</h2>
+    <p>{{ apartment.address }}</p>
+    <form method="post" action="/validation/{{ apartment.id }}" style="display: flex; flex-direction: column; width:40%">
+        <label>Check-in date:</label>
+        <input type="date" name="selected_from">
+        <label>Check-out date:</label>
+        <input type="date" name="selected_to">
+        <button type="submit" name="submit">ADD</button>
+
+    </form>
+</div>

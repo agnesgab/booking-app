@@ -1,0 +1,8 @@
+<a href="/select">Back</a>
+<h1>All Apartments:</h1>
+
+<ul>
+    {% for apartment in apartments %}
+    <li><a href="/index/{{ apartment.id }}">{{ apartment.name }}</a></li>
+    {% endfor %}
+</ul>
