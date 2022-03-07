@@ -1,3 +1,26 @@
-<h1>BOOKING</h1>
-<a href="/signup">Sign Up</a>
-<a href="/login">Log In</a>
+{{ include('header.html') }}
+
+<div class="container">
+    <a href="/login">Log In</a>
+    <a href="/signup">Sign Up</a>
+</div>
+
+
+<style>
+
+    .container{
+        display: flex;
+        flex-direction:column;
+        justify-content: center;
+    }
+
+
+    a {
+        color: black;
+        align-self: center;
+        font-size: 24px;
+        margin-bottom: 10px;
+    }
+
+
+</style>

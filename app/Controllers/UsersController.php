@@ -57,7 +57,7 @@ class UsersController
 
     }
 
-    public function startSession(): Redirect
+    public function startSession()
     {
 
         $userEmail = $_POST['email'];
@@ -72,16 +72,24 @@ class UsersController
 
         if (!empty($userQuery)) {
             $_SESSION['id'] = (int)$userQuery[0]['id'];
-            return new Redirect('/index');
+            return new Redirect('/select');
+            //return new View('Users/select.html');
         }
 
         return new Redirect('/login');
 
     }
 
-    public function select(): View{
-
+    public function select(){
         return new View('Users/select.html');
     }
+
+    public function logout(): Redirect{
+        session_destroy();
+        return new Redirect('/start');
+    }
+
+
+
 
 }

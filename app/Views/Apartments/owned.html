@@ -1,19 +1,19 @@
 {{ include('header.html') }}
 <a href="/select">Back</a>
-<h2>My Reservations:</h2>
+<h2>My Apartments:</h2>
 <div class="container">
 
-    {% for reservation in reservations %}
+    {% for apartment in apartments %}
     <div class="box">
 
-        <h3><a href="/index/{{ reservation.apartmentId }}">{{ reservation.apartmentName }}</a></h3>
-        <p>{{ reservation.apartmentAddress}}</p>
-        <p>{{ reservation.dateFrom}} / {{ reservation.dateTo }}</p>
+        <h3><a href="/index/{{ reservation.apartmentId }}">{{ apartment.name }}</a></h3>
+        <p>{{ apartment.address}}</p>
+        <p>{{ apartment.availableFrom}} / {{ apartment.availableTo }}</p>
         <div>
             <form>
                 <button>Edit</button>
             </form>
-            <form method="get" action="/cancel/{{ reservation.apartmentId }}"><button type="submit" onclick="confirm('Are you sure?')">Cancel Reservation</button></form>
+            <form method="post" action="/delete/{{ apartment.id }}"><button type="submit" onclick="confirm('Are you sure?')">Delete</button></form>
 
             </form>
         </div>

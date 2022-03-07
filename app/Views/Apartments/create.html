@@ -1,5 +1,7 @@
-<div >
-    <h1>Add Apartment</h1>
+{{ include('header.html') }}
+<a href="/select">Back</a>
+<h2>Add Apartment</h2>
+<div class="container">
     <form method="post" action="/store" style="display: flex; flex-direction: column; width:40%">
         <label>Name:</label>
         <input type="text" name="name" placeholder="Name">
@@ -10,8 +12,41 @@
         <label>Available to:</label>
         <input type="date" name="available_to">
         <label>Description:</label>
-        <input type="text" name="description" placeholder="Description">
+        <input type="text" name="description" placeholder="Description" size="200">
         <button type="submit" name="submit">ADD</button>
 
     </form>
 </div>
+
+<style>
+
+    .container{
+        display: flex;
+        flex-direction:column;
+        justify-content: center;
+    }
+
+    h2 {
+        text-align: center;
+    }
+
+    form {
+        display: flex;
+        flex-direction: column;
+        align-self: center;
+        width: 10%;
+        text-align: center;
+    }
+
+    input {
+        margin-bottom: 10px;
+        width: 50%;
+        align-self: center;
+    }
+
+    button {
+        width: 30%;
+        align-self: center;
+    }
+
+</style>

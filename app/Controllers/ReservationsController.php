@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Database;
 use App\Models\Reservation;
+use App\Redirect;
 use App\View;
 
 class ReservationsController
@@ -13,48 +14,35 @@ class ReservationsController
     /**
      * @throws \Doctrine\DBAL\Exception
      */
-    public function index(array $vars): View
+    public function index(): View
     {
 
-        $reservationsQuery = Database::connection()
+        $myReservationsQuery = Database::connection()
             ->createQueryBuilder()
             ->select('*')
-            ->from('reservations')
-            ->where('user_id = ?')
-            ->setParameter(0, $_SESSION['id'])
+            ->from('reservations', 'r')
+            ->innerJoin('r', 'apartments', 'a', 'r.apartment_id = a.id')
+            ->where('r.user_id = ?')
+            ->setParameter(0, (int)$_SESSION['id'])
             ->executeQuery()
             ->fetchAllAssociative();
 
+        $reservations = [];
 
-
-        //šeit vajadzētu taisīt join, bet nu pagaidām tā
-
-
-        $myReservations = [];
-
-        foreach ($reservationsQuery as $data) {
-
-            $apartmentQuery = Database::connection()
-                ->createQueryBuilder()
-                ->select('*')
-                ->from('apartments')
-                ->where('id = ?')
-                ->setParameter(0, $data['apartment_id'])
-                ->executeQuery()
-                ->fetchAllAssociative();
-
-            $myReservations[] = new Reservation(
+        foreach ($myReservationsQuery as $data){
+            $reservations[] = new Reservation(
                 $data['user_id'],
                 $data['apartment_id'],
-                $apartmentQuery[0]['name'],
-                $apartmentQuery[0]['address'],
+                $data['name'],
+                $data['address'],
                 $data['reservation_date_from'],
-                $data['reservation_date_to']
+                $data['reservation_date_to'],
+                $data['id']
             );
-
         }
 
-        return new View('Reservations/index.html', ['reservations' => $myReservations]);
+
+        return new View('Reservations/index.html', ['reservations' => $reservations]);
 
     }
 
@@ -65,12 +53,17 @@ class ReservationsController
         return new View('Reservations/show.html');
     }
 
-    public function delete(){
-        var_dump('remove this');
+    public function cancel(array $vars): Redirect {
+
+
+        Database::connection()
+            ->delete('reservations', ['user_id' => $_SESSION['id'],'apartment_id' => (int)$vars['id']]);
+
+        return new Redirect('/reservations');
+
     }
 
 
-    //delete
-    //edit
+    //UZTAISĪT EDIT FUNKCIJU
 
 }

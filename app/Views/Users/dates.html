@@ -1,15 +1,13 @@
 {{ include('header.html') }}
-<a href="/index/{{ apartment.id }}">Back</a>
+<a href="/select">Back</a>
 <div class="container">
-    <h2>New reservation</h2>
-    <h3>{{ apartment.name }}</h3>
-    <p>{{ apartment.address }}</p>
-    <form method="post" action="/validation/{{ apartment.id }}" style="display: flex; flex-direction: column; width:40%">
+    <h3>Select Dates:</h3>
+    <form method="post" action="/dates/search" style="display: flex; flex-direction: column; width:40%">
         <label>Check-in date:</label>
         <input type="date" name="selected_from">
         <label>Check-out date:</label>
         <input type="date" name="selected_to">
-        <button type="submit" name="submit">ADD</button>
+        <button type="submit" name="submit">Search</button>
 
     </form>
 
@@ -22,9 +20,8 @@
         justify-content: center;
     }
 
-    h2, h3, p {
+    h3 {
         text-align: center;
-        margin-top: 2px;
     }
 
     form {
@@ -36,7 +33,7 @@
     }
 
     input {
-        margin-bottom: 5px;
+        margin-bottom: 10px;
         width: 40%;
         align-self: center;
     }

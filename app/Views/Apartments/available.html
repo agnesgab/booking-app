@@ -1,11 +1,13 @@
 {{ include('header.html') }}
-<a href="/select">Back</a>
-<h3>All Apartments:</h3>
+<a href="/dates">Back</a>
 <div class="container">
-    <div class="box" >
-        {% for apartment in apartments %}
-        <a href="/index/{{ apartment.id }}">{{ apartment.name }}</a>
-        {% endfor %}
+    <h3>Available apartments</h3>
+    <p>Check-in: {{ from }}</p>
+    <p>Check-out: {{ to }}</p>
+    <div class="box">
+    {% for apartment in available_apartments %}
+     <a href="/index/{{ apartment.id }}">{{ apartment.name }}</a>
+    {% endfor %}
     </div>
 </div>
 
@@ -23,6 +25,10 @@
         margin-bottom: 2px;
     }
 
+    p {
+        text-align: center;
+        margin: 0;
+    }
 
     a {
         margin-top: 10px;

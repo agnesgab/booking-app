@@ -1,13 +1,42 @@
-<a href="/index">Back</a>
+{{ include('header.html') }}
+<a href="/select">Back</a>
 
-<div>
-    <h1>{{ apartment.name }}</h1>
+<div class="container">
+    <h3>{{ apartment.name }}</h3>
     <p>{{ apartment.description }}</p>
     <ul>
-        <li>Available from: {{ apartment.availableFrom}}</li>
+        <li>Available from: {{ apartment.availableFrom }}</li>
         <li>Available to: {{ apartment.availableTo }}</li>
     </ul>
-
     <form method="get" name="book" action="/book/{{ apartment.id }}"><button type="submit">BOOK</button></form>
 
 </div>
+
+<style>
+
+    .container{
+        display: flex;
+        flex-direction:column;
+        justify-content: center;
+    }
+
+    h3 {
+        text-align: center;
+        margin-bottom: 2px;
+    }
+
+    p {
+        text-align: center;
+        margin: 0;
+    }
+
+    ul {
+        align-self: center;
+    }
+
+    form {
+        align-self: center;
+    }
+
+
+</style>

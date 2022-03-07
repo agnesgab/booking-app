@@ -57,10 +57,11 @@ class ApartmentsController
                 'address' => $_POST['address'],
                 'available_from' => $_POST['available_from'],
                 'available_to' => $_POST['available_to'],
-                'description' => $_POST['description']
+                'description' => $_POST['description'],
+                'owner_id' => $_SESSION['id']
             ]);
 
-        return new Redirect('/index.html');
+        return new Redirect('/manage');
 
     }
 
@@ -78,13 +79,16 @@ class ApartmentsController
 
 
         $apartment = new Apartment(
+
             $apartmentQuery[0]['id'],
             $apartmentQuery[0]['name'],
             $apartmentQuery[0]['address'],
+            $apartmentQuery[0]['description'],
             $apartmentQuery[0]['available_from'],
-            $apartmentQuery[0]['available_to'],
-            $apartmentQuery[0]['description']
+            $apartmentQuery[0]['available_to']
+
         );
+
 
         return new View('Apartments/show.html', ['apartment' => $apartment]);
     }
@@ -94,6 +98,7 @@ class ApartmentsController
      */
     public function doReservation(array $vars): View
     {
+
         $apartmentQuery = Database::connection()
             ->createQueryBuilder()
             ->select('*')
@@ -185,6 +190,96 @@ class ApartmentsController
 
         return new Redirect('/reservations');
 
+    }
+
+    public function dates()
+    {
+
+        return new View('Users/dates.html');
+    }
+
+    public function showAvailable()
+    {
+
+
+        $selectedFrom = \Carbon\Carbon::createFromFormat('Y-m-d', $_POST['selected_from']);
+        $selectedTo = \Carbon\Carbon::createFromFormat('Y-m-d', $_POST['selected_to']);
+        $selectedDatesRange = CarbonPeriod::create($selectedFrom, $selectedTo);
+
+        $apartmentsAndReservationsQuery = Database::connection()
+            ->createQueryBuilder()
+            ->select('*')
+            ->from('reservations', 'r')
+            ->innerJoin('r', 'apartments',
+                'a', 'r.apartment_id = a.id')
+            ->executeQuery()
+            ->fetchAllAssociative();
+
+        $availableApartments = [];
+
+        foreach ($apartmentsAndReservationsQuery as $data) {
+
+            $seasonAvailableRange = CarbonPeriod::create(
+                $data['available_from'], $data['available_to']
+            );
+            $notAvailableRanges = CarbonPeriod::create(
+                $data['reservation_date_from'], $data['reservation_date_to']
+            );
+
+            if ($seasonAvailableRange->overlaps($selectedDatesRange) &&
+                !$notAvailableRanges->overlaps($selectedDatesRange)) {
+                $availableApartments[] = new Apartment(
+                    $data['apartment_id'],
+                    $data['name'],
+                    $data['address'],
+                    $data['description'],
+                );
+            }
+
+
+        }
+
+        return new View('Apartments/available.html', [
+            'available_apartments' => $availableApartments,
+            'from' => $_POST['selected_from'],
+            'to' => $_POST['selected_to']]);
+
+    }
+
+    public function manage(): View{
+        $myApartmentsQuery = Database::connection()
+            ->createQueryBuilder()
+            ->select('*')
+            ->from('apartments', 'r')
+            ->where('owner_id = ?')
+            ->setParameter(0, (int)$_SESSION['id'])
+            ->executeQuery()
+            ->fetchAllAssociative();
+
+        $apartments = [];
+
+        foreach ($myApartmentsQuery as $data){
+            $apartments[] = new Apartment(
+                $data['id'],
+                $data['name'],
+                $data['address'],
+                $data['description'],
+                $data['owner_id'],
+                $data['available_from'],
+                $data['available_to']
+
+            );
+        }
+
+        return new View('Apartments/owned.html', ['apartments' => $apartments]);
+    }
+
+    public function delete(array $vars): Redirect{
+
+        Database::connection()
+            ->delete('apartments', ['owner_id' => $_SESSION['id'],'id' => (int)$vars['id']]);
+
+        return new Redirect('/manage');
     }
 
 

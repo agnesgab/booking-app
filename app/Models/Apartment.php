@@ -2,30 +2,36 @@
 
 namespace App\Models;
 
-class Apartment {
-
-    private ?int $id;
+class Apartment
+{
     private string $name;
     private string $address;
+    private string $description;
+    private int $ownerId;
+    private ?int $id;
     private ?string $availableFrom;
     private ?string $availableTo;
-    private string $description;
 
     /**
      * @param string $name
      * @param string $address
+     * @param string $description
+     * @param int|null $id
      * @param string|null $availableFrom
      * @param string|null $availableTo
-     * @param string $description
      */
-    public function __construct(?int $id, string $name, string $address, ?string $availableFrom, ?string $availableTo, string $description)
+    public function __construct(?int $id, string $name, string $address, string $description, int $ownerId = null, ?string $availableFrom = null, ?string $availableTo = null)
     {
-        $this->id = $id;
+
         $this->name = $name;
         $this->address = $address;
-        $this->availableFrom = $availableFrom;
-        $this->availableTo = $availableTo;
         $this->description = $description;
+        $this->ownerId = $ownerId;
+        $this->availableFrom = $availableFrom;
+        $this->id = $id;
+        $this->availableTo = $availableTo;
+
+
     }
 
 
@@ -36,6 +42,7 @@ class Apartment {
     {
         return $this->id;
     }
+
     /**
      * @return string
      */
@@ -74,6 +81,14 @@ class Apartment {
     public function getDescription(): string
     {
         return $this->description;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getOwnerId(): ?int
+    {
+        return $this->ownerId;
     }
 
 

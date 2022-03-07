@@ -10,6 +10,7 @@ require_once 'vendor/autoload.php';
 session_start();
 
 var_dump($_SESSION['id']);
+
 $dispatcher = FastRoute\simpleDispatcher(function (FastRoute\RouteCollector $r) {
     //register and login
     $r->addRoute('GET', '/start', ['App\Controllers\SignupController', 'start']);
@@ -17,11 +18,13 @@ $dispatcher = FastRoute\simpleDispatcher(function (FastRoute\RouteCollector $r) 
     $r->addRoute('POST', '/signup', ['App\Controllers\UsersController', 'storeUser']);
     $r->addRoute('GET', '/login', ['App\Controllers\UsersController', 'login']);
     $r->addRoute('POST', '/login', ['App\Controllers\UsersController', 'startSession']);
+    $r->addRoute('POST', '/logout', ['App\Controllers\UsersController', 'logout']);
+
 
     //user select
     $r->addRoute('GET', '/select', ['App\Controllers\UsersController', 'select']);
 
-
+    //nothing going on
     $r->addRoute('GET', '/users', ['App\Controllers\UsersController', 'index']);
     $r->addRoute('GET', '/users/id', ['App\Controllers\UsersController', 'show']);
 
@@ -30,13 +33,20 @@ $dispatcher = FastRoute\simpleDispatcher(function (FastRoute\RouteCollector $r) 
     $r->addRoute('GET', '/index/{id:\d+}', ['App\Controllers\ApartmentsController', 'show']);
     $r->addRoute('GET', '/create', ['App\Controllers\ApartmentsController', 'create']);
     $r->addRoute('POST', '/store', ['App\Controllers\ApartmentsController', 'store']);
+    $r->addRoute('GET', '/manage', ['App\Controllers\ApartmentsController', 'manage']);
+    $r->addRoute('POST', '/delete/{id:\d+}', ['App\Controllers\ApartmentsController', 'delete']);
+
+    //reservation
+    $r->addRoute('GET', '/dates', ['App\Controllers\ApartmentsController', 'dates']);
+    $r->addRoute('POST', '/dates/search', ['App\Controllers\ApartmentsController', 'showAvailable']);
     $r->addRoute('GET', '/book/{id:\d+}', ['App\Controllers\ApartmentsController', 'doReservation']);
     $r->addRoute('POST', '/validation/{id:\d+}', ['App\Controllers\ApartmentsController', 'validateReservation']);
 
-    //reservations
+
+    //reservation results
     $r->addRoute('GET', '/reservations', ['App\Controllers\ReservationsController', 'index']);
     $r->addRoute('GET', '/reservation', ['App\Controllers\ReservationsController', 'show']);
-    $r->addRoute('POST', '/delete', ['App\Controllers\ReservationsController', 'delete']);
+    $r->addRoute('GET', '/cancel/{id:\d+}', ['App\Controllers\ReservationsController', 'cancel']);
 
 
 
