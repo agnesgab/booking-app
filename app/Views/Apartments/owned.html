@@ -10,7 +10,7 @@
         <p>{{ apartment.address}}</p>
         <p>{{ apartment.availableFrom}} / {{ apartment.availableTo }}</p>
         <div>
-            <form>
+            <form method="get" action="/edit/{{ apartment.id }}">
                 <button>Edit</button>
             </form>
             <form method="post" action="/delete/{{ apartment.id }}"><button type="submit" onclick="confirm('Are you sure?')">Delete</button></form>

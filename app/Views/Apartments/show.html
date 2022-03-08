@@ -4,12 +4,31 @@
 <div class="container">
     <h3>{{ apartment.name }}</h3>
     <p>{{ apartment.description }}</p>
+    <h3>Price per night: {{ apartment.price }} EUR</h3>
     <ul>
         <li>Available from: {{ apartment.availableFrom }}</li>
         <li>Available to: {{ apartment.availableTo }}</li>
     </ul>
     <form method="get" name="book" action="/book/{{ apartment.id }}"><button type="submit">BOOK</button></form>
 
+</div>
+
+<div>
+    {% for comment in comments %}
+    <div style="border: 1px solid black; width: 200px">
+        <h4>{{ comment.userName }} {{ comment.userSurname }}</h4>
+        <p>{{ comment.comment }}</p>
+        <small>{{ comment.createdAt }}</small>
+    </div>
+    {% endfor %}
+</div>
+
+<div>
+    <form method="post" action="/comment/{{ apartment.id }}" style="width: 300px; border: 1px solid blue">
+        <p>{{ name }} {{ surname }}:</p>
+        <textarea name="comment"></textarea>
+        <button type="submit">ADD</button>
+    </form>
 </div>
 
 <style>

@@ -9,8 +9,6 @@ require_once 'vendor/autoload.php';
 
 session_start();
 
-var_dump($_SESSION['id']);
-
 $dispatcher = FastRoute\simpleDispatcher(function (FastRoute\RouteCollector $r) {
     //register and login
     $r->addRoute('GET', '/start', ['App\Controllers\SignupController', 'start']);
@@ -34,7 +32,10 @@ $dispatcher = FastRoute\simpleDispatcher(function (FastRoute\RouteCollector $r) 
     $r->addRoute('GET', '/create', ['App\Controllers\ApartmentsController', 'create']);
     $r->addRoute('POST', '/store', ['App\Controllers\ApartmentsController', 'store']);
     $r->addRoute('GET', '/manage', ['App\Controllers\ApartmentsController', 'manage']);
+    $r->addRoute('POST', '/manage/{id:\d+}', ['App\Controllers\ApartmentsController', 'saveChanges']);
     $r->addRoute('POST', '/delete/{id:\d+}', ['App\Controllers\ApartmentsController', 'delete']);
+    $r->addRoute('GET', '/edit/{id:\d+}', ['App\Controllers\ApartmentsController', 'edit']);
+
 
     //reservation
     $r->addRoute('GET', '/dates', ['App\Controllers\ApartmentsController', 'dates']);
@@ -47,6 +48,9 @@ $dispatcher = FastRoute\simpleDispatcher(function (FastRoute\RouteCollector $r) 
     $r->addRoute('GET', '/reservations', ['App\Controllers\ReservationsController', 'index']);
     $r->addRoute('GET', '/reservation', ['App\Controllers\ReservationsController', 'show']);
     $r->addRoute('GET', '/cancel/{id:\d+}', ['App\Controllers\ReservationsController', 'cancel']);
+
+    //comments
+    $r->addRoute('POST', '/comment/{id:\d+}', ['App\Controllers\CommentsController', 'comment']);
 
 
 

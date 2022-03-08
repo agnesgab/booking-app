@@ -9,13 +9,13 @@
         <h3><a href="/index/{{ reservation.apartmentId }}">{{ reservation.apartmentName }}</a></h3>
         <p>{{ reservation.apartmentAddress}}</p>
         <p>{{ reservation.dateFrom}} / {{ reservation.dateTo }}</p>
+        <p>Total: {{ reservation.totalPrice }} EUR</p>
         <div>
-            <form>
-                <button>Edit</button>
-            </form>
-            <form method="get" action="/cancel/{{ reservation.apartmentId }}"><button type="submit" onclick="confirm('Are you sure?')">Cancel Reservation</button></form>
 
+            <form method="get" action="/cancel/{{ reservation.apartmentId }}">
+                <button type="submit" onclick="confirm('Are you sure?')">Cancel Reservation</button>
             </form>
+
         </div>
 
     </div>
@@ -23,12 +23,12 @@
 </div>
 
 
-
 <style>
 
     h2 {
         text-align: center;
     }
+
     .container {
         display: flex;
         flex-direction: row;
@@ -43,8 +43,6 @@
         border: 1px solid black;
 
     }
-
-
 
 
 </style>

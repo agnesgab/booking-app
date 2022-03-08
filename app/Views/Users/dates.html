@@ -4,14 +4,34 @@
     <h3>Select Dates:</h3>
     <form method="post" action="/dates/search" style="display: flex; flex-direction: column; width:40%">
         <label>Check-in date:</label>
-        <input type="date" name="selected_from">
+        <input type="date" name="selected_from" id="today" min="today">
         <label>Check-out date:</label>
-        <input type="date" name="selected_to">
+        <input type="date" name="selected_to" id="tomorrow" min="tomorrow">
         <button type="submit" name="submit">Search</button>
 
     </form>
 
 </div>
+
+<script>
+    let today = new Date();
+    let tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1)
+    let dd = String(today.getDate()).padStart(2, '0');
+    let mm = String(today.getMonth() + 1).padStart(2, '0');
+    let dd2 = String(tomorrow.getDate()).padStart(2, '0');
+    let mm2 = String(tomorrow.getMonth() + 1).padStart(2, '0');
+    let yyyy = today.getFullYear();
+
+    today = yyyy + '-' + mm + '-' + dd;
+    tomorrow = yyyy + '-' + mm2 + '-' + dd2;
+
+    document.getElementById("today").defaultValue = today;
+    document.getElementById("tomorrow").defaultValue = tomorrow;
+    document.getElementById("today").setAttribute("min", today);
+    document.getElementById("tomorrow").setAttribute("min", tomorrow);
+
+</script>
 
 <style>
     .container{

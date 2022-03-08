@@ -7,7 +7,8 @@ class Apartment
     private string $name;
     private string $address;
     private string $description;
-    private int $ownerId;
+    private int $price;
+    private ?int $ownerId;
     private ?int $id;
     private ?string $availableFrom;
     private ?string $availableTo;
@@ -20,7 +21,12 @@ class Apartment
      * @param string|null $availableFrom
      * @param string|null $availableTo
      */
-    public function __construct(?int $id, string $name, string $address, string $description, int $ownerId = null, ?string $availableFrom = null, ?string $availableTo = null)
+    public function __construct(
+        ?int    $id, string $name, string $address,
+        string  $description, int $price,
+        int     $ownerId = null,
+        ?string $availableFrom = null, ?string $availableTo = null
+    )
     {
 
         $this->name = $name;
@@ -30,8 +36,7 @@ class Apartment
         $this->availableFrom = $availableFrom;
         $this->id = $id;
         $this->availableTo = $availableTo;
-
-
+        $this->price = $price;
     }
 
 
@@ -89,6 +94,14 @@ class Apartment
     public function getOwnerId(): ?int
     {
         return $this->ownerId;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPrice(): int
+    {
+        return $this->price;
     }
 
 

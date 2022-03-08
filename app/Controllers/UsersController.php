@@ -80,16 +80,16 @@ class UsersController
 
     }
 
-    public function select(){
+    public function select()
+    {
         return new View('Users/select.html');
     }
 
-    public function logout(): Redirect{
+    public function logout(): Redirect
+    {
         session_destroy();
         return new Redirect('/start');
     }
-
-
 
 
 }

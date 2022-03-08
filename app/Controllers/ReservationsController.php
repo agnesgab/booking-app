@@ -6,6 +6,7 @@ use App\Database;
 use App\Models\Reservation;
 use App\Redirect;
 use App\View;
+use Carbon\CarbonInterval;
 
 class ReservationsController
 {
@@ -29,7 +30,7 @@ class ReservationsController
 
         $reservations = [];
 
-        foreach ($myReservationsQuery as $data){
+        foreach ($myReservationsQuery as $data) {
             $reservations[] = new Reservation(
                 $data['user_id'],
                 $data['apartment_id'],
@@ -37,6 +38,7 @@ class ReservationsController
                 $data['address'],
                 $data['reservation_date_from'],
                 $data['reservation_date_to'],
+                $data['total_price'],
                 $data['id']
             );
         }
@@ -53,17 +55,16 @@ class ReservationsController
         return new View('Reservations/show.html');
     }
 
-    public function cancel(array $vars): Redirect {
+    public function cancel(array $vars): Redirect
+    {
 
 
         Database::connection()
-            ->delete('reservations', ['user_id' => $_SESSION['id'],'apartment_id' => (int)$vars['id']]);
+            ->delete('reservations', ['user_id' => $_SESSION['id'], 'apartment_id' => (int)$vars['id']]);
 
         return new Redirect('/reservations');
 
     }
 
-
-    //UZTAISĪT EDIT FUNKCIJU
 
 }
