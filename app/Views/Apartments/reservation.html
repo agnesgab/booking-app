@@ -6,15 +6,14 @@
     <h3>Price per night: {{ apartment.price }} EUR</h3>
     <p>{{ apartment.address }}</p>
     <form method="post" action="/validation/{{ apartment.id }}" style="display: flex; flex-direction: column; width:40%">
-        <label>Check-in date:</label>
-        <input type="date" name="selected_from" id="today" min="today">
-        <label>Check-out date:</label>
-        <input type="date" name="selected_to" id="tomorrow" min="tomorrow">
+        {{ include('datepicker.html') }}
         <button type="submit" name="submit">ADD</button>
-
     </form>
 
+
+
 </div>
+{{ include('footer.html') }}
 
 <script>
     let today = new Date();

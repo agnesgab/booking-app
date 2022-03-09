@@ -1,4 +1,8 @@
 {{ include('header.html') }}
+<div class="logout">
+    <a href="/logout">Log Out</a>
+</div>
+
 <div class="container">
     <form method="get" action="/dates">
         <h3>Select Dates</h3>
@@ -35,16 +39,29 @@
 
     }
 
+    h3 {
+        font-size: 24px;
+    }
+
     form {
         display: flex;
         flex-direction: column;
+        justify-content: space-between;
         width: 20%;
         padding: 10px;
-        background-color: orange;
+        background-color: #FFA500D0;
         margin: 10px;
     }
 
     button {
         width: 70px;
     }
+
+    .logout {
+        display: flex;
+        justify-content: start;
+        padding-left: 20px;
+        margin-bottom: 10px;
+    }
+
 </style>

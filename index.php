@@ -16,7 +16,7 @@ $dispatcher = FastRoute\simpleDispatcher(function (FastRoute\RouteCollector $r) 
     $r->addRoute('POST', '/signup', ['App\Controllers\UsersController', 'storeUser']);
     $r->addRoute('GET', '/login', ['App\Controllers\UsersController', 'login']);
     $r->addRoute('POST', '/login', ['App\Controllers\UsersController', 'startSession']);
-    $r->addRoute('POST', '/logout', ['App\Controllers\UsersController', 'logout']);
+    $r->addRoute('GET', '/logout', ['App\Controllers\UsersController', 'logout']);
 
 
     //user select

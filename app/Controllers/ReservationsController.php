@@ -57,10 +57,18 @@ class ReservationsController
 
     public function cancel(array $vars): Redirect
     {
-
+        $id = Database::connection()
+            ->createQueryBuilder()
+            ->select('id')
+            ->from('reservations')
+            ->where('user_id = ?','apartment_id = ?')
+            ->setParameter(0,$_SESSION['id'] )
+            ->setParameter(1, (int)$vars['id'])
+            ->executeQuery()
+            ->fetchOne();
 
         Database::connection()
-            ->delete('reservations', ['user_id' => $_SESSION['id'], 'apartment_id' => (int)$vars['id']]);
+            ->delete('reservations', ['id' => (int)$id, 'user_id' => $_SESSION['id'], 'apartment_id' => (int)$vars['id']]);
 
         return new Redirect('/reservations');
 
