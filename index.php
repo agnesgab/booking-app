@@ -40,8 +40,8 @@ $dispatcher = FastRoute\simpleDispatcher(function (FastRoute\RouteCollector $r) 
     //reservation
     $r->addRoute('GET', '/dates', ['App\Controllers\ApartmentsController', 'dates']);
     $r->addRoute('POST', '/dates/search', ['App\Controllers\ApartmentsController', 'showAvailable']);
-    $r->addRoute('GET', '/book/{id:\d+}', ['App\Controllers\ApartmentsController', 'doReservation']);
-    $r->addRoute('POST', '/validation/{id:\d+}', ['App\Controllers\ApartmentsController', 'validateReservation']);
+    $r->addRoute('GET', '/book/{id:\d+}', ['App\Controllers\ReservationsController', 'doReservation']);
+    $r->addRoute('POST', '/validation/{id:\d+}', ['App\Controllers\ReservationsController', 'validateReservation']);
 
 
     //reservation results

@@ -73,7 +73,6 @@ class UsersController
         if (!empty($userQuery)) {
             $_SESSION['id'] = (int)$userQuery[0]['id'];
             return new Redirect('/select');
-            //return new View('Users/select.html');
         }
 
         return new Redirect('/login');

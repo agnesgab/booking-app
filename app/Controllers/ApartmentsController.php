@@ -5,7 +5,6 @@ namespace App\Controllers;
 use App\Database;
 use App\Models\Apartment;
 use App\Models\Comment;
-use App\Models\Profile;
 use App\View;
 use App\Redirect;
 use Carbon\CarbonPeriod;
@@ -144,154 +143,6 @@ class ApartmentsController
             'comments' => $comments]);
     }
 
-    /**
-     * @throws \Doctrine\DBAL\Exception
-     */
-    public function doReservation(array $vars): View
-    {
-
-        $apartmentQuery = Database::connection()
-            ->createQueryBuilder()
-            ->select('*')
-            ->from('apartments')
-            ->where('id = ?')
-            ->setParameter(0, (int)$vars['id'])
-            ->executeQuery()
-            ->fetchAllAssociative();
-
-
-        $apartment = new Apartment(
-            $apartmentQuery[0]['id'],
-            $apartmentQuery[0]['name'],
-            $apartmentQuery[0]['address'],
-            $apartmentQuery[0]['description'],
-            $apartmentQuery[0]['price'],
-            null,
-            $apartmentQuery[0]['available_from'],
-            $apartmentQuery[0]['available_to'],
-
-        );
-
-        $reservationsQuery = Database::connection()
-            ->createQueryBuilder()
-            ->select('*')
-            ->from('reservations')
-            ->where('apartment_id = ?')
-            ->setParameter(0, (int)$vars['id'])
-            ->executeQuery()
-            ->fetchAllAssociative();
-
-        $apartmentReservationRanges = [];
-
-        foreach ($reservationsQuery as $reservation) {
-            $apartmentReservationRanges[] = CarbonPeriod::create(
-                $reservation['reservation_date_from'], $reservation['reservation_date_to']);
-
-        }
-
-        $unavailableDates = [];
-
-
-        foreach ($apartmentReservationRanges as $range) {
-
-            foreach ($range as $date) {
-                $unavailableDates[] = $date->format('m-d-Y');
-            }
-        }
-
-
-        return new View('Apartments/reservation.html', ['apartment' => $apartment, 'dates' => $unavailableDates]);
-
-    }
-
-    public function validateReservation(array $vars)
-    {
-
-        $inputFrom = date("Y-m-d",strtotime($_POST['selected_from']));
-        $inputTo = date("Y-m-d",strtotime($_POST['selected_to']));
-
-        $selectedFrom = \Carbon\Carbon::createFromFormat('Y-m-d', $inputFrom);
-        $selectedTo = \Carbon\Carbon::createFromFormat('Y-m-d', $inputTo);
-        $selectedDatesRange = CarbonPeriod::create($selectedFrom, $selectedTo);
-
-        $selectedDates = [];
-
-        foreach ($selectedDatesRange as $date){
-            $selectedDates[] = $date->format('Y-m-d');
-        }
-
-        $apartmentQuery = Database::connection()
-            ->createQueryBuilder()
-            ->select('*')
-            ->from('apartments')
-            ->where('id = ?')
-            ->setParameter(0, (int)$vars['id'])
-            ->executeQuery()
-            ->fetchAllAssociative();
-
-
-        foreach ($apartmentQuery as $data) {
-            $availableDatesRange = CarbonPeriod::create($data['available_from'], $data['available_to']);
-        }
-
-
-        $reservationsQuery = Database::connection()
-            ->createQueryBuilder()
-            ->select('*')
-            ->from('reservations')
-            ->where('apartment_id = ?')
-            ->setParameter(0, (int)$vars['id'])
-            ->executeQuery()
-            ->fetchAllAssociative();
-
-        $apartmentReservationRanges = [];
-
-        foreach ($reservationsQuery as $reservation) {
-            $apartmentReservationRanges[] = CarbonPeriod::create(
-                $reservation['reservation_date_from'], $reservation['reservation_date_to']);
-
-        }
-
-        $count = 0;
-
-        foreach ($apartmentReservationRanges as $range) {
-
-            if (!$selectedDatesRange->overlaps($availableDatesRange) || $selectedDatesRange->overlaps($range)) {
-                $count += 1;
-            }
-        }
-
-
-        if ($count < 1) {
-
-            $priceQuery = Database::connection()
-                ->createQueryBuilder()
-                ->select('price')
-                ->from('apartments')
-                ->where('id = ?')
-                ->setParameter(0, (int)$vars['id'])
-                ->executeQuery()
-                ->fetchOne();
-
-
-            $days = count($selectedDates);
-            $totalPrice = (int)$priceQuery * $days;
-
-            Database::connection()
-                ->insert('reservations', [
-                    'apartment_id' => (int)$vars['id'],
-                    'user_id' => $_SESSION['id'],
-                    'reservation_date_from' => $inputFrom,
-                    'reservation_date_to' => $inputTo,
-                    'total_price' => $totalPrice
-                ]);
-
-        }
-
-
-        return new Redirect('/reservations');
-
-    }
 
     public function dates()
     {
@@ -302,33 +153,65 @@ class ApartmentsController
     public function showAvailable()
     {
 
-
         $selectedFrom = \Carbon\Carbon::createFromFormat('Y-m-d', $_POST['selected_from']);
         $selectedTo = \Carbon\Carbon::createFromFormat('Y-m-d', $_POST['selected_to']);
         $selectedDatesRange = CarbonPeriod::create($selectedFrom, $selectedTo);
 
-        $apartmentsAndReservationsQuery = Database::connection()
+
+        $apartmentsQuery = Database::connection()
             ->createQueryBuilder()
             ->select('*')
-            ->from('reservations', 'r')
-            ->innerJoin('r', 'apartments',
-                'a', 'r.apartment_id = a.id')
+            ->from('apartments')
             ->executeQuery()
             ->fetchAllAssociative();
 
+        $reservationsQuery = Database::connection()
+            ->createQueryBuilder()
+            ->select('*')
+            ->from('reservations')
+            ->executeQuery()
+            ->fetchAllAssociative();
+
+        $availableId = [];
+
+        foreach ($apartmentsQuery as $apartment){
+
+            $range = CarbonPeriod::create(
+                $apartment['available_from'], $apartment['available_to']);
+
+            if($range->overlaps($selectedDatesRange)){
+                $availableId[] = (int)$apartment['id'];
+            }
+        }
+
+        foreach ($reservationsQuery as $reservation){
+
+            $range = CarbonPeriod::create(
+                $reservation['reservation_date_from'], $reservation['reservation_date_to']);
+
+            if(!$range->overlaps($selectedDatesRange) && in_array($reservation['apartment_id'], $availableId)){
+
+                $availableId[] = (int)$reservation['apartment_id'];
+            }
+        }
+
+
+        $availableId = array_unique($availableId);
         $availableApartments = [];
 
-        foreach ($apartmentsAndReservationsQuery as $data) {
+        foreach ($availableId as $id){
 
-            $seasonAvailableRange = CarbonPeriod::create(
-                $data['available_from'], $data['available_to']
-            );
-            $notAvailableRanges = CarbonPeriod::create(
-                $data['reservation_date_from'], $data['reservation_date_to']
-            );
+            $availableApartmentsQuery = Database::connection()
+                ->createQueryBuilder()
+                ->select('*')
+                ->from('apartments')
+                ->where('id = ?')
+                ->setParameter(0, $id)
+                ->executeQuery()
+                ->fetchAllAssociative();
 
-            if ($seasonAvailableRange->overlaps($selectedDatesRange) &&
-                !$notAvailableRanges->overlaps($selectedDatesRange)) {
+            foreach ($availableApartmentsQuery as $data){
+
                 $availableApartments[] = new Apartment(
                     $data['id'],
                     $data['name'],
@@ -341,8 +224,8 @@ class ApartmentsController
                 );
             }
 
-
         }
+
 
         return new View('Apartments/available.html', [
             'available_apartments' => $availableApartments,

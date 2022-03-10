@@ -3,65 +3,33 @@
     <a href="/logout">Log Out</a>
 </div>
 
-<div class="container">
-    <form method="get" action="/dates">
+<div class="container container-select">
+    <form class="form-select" method="get" action="/dates">
         <h3>Select Dates</h3>
         <p>See all available apartments on your travel dates.</p>
         <button>Select</button>
     </form>
-    <form method="get" action="/index">
+    <form class="form-select" method="get" action="/index">
         <h3>See All Apartments</h3>
         <p>Check out all apartments. Choose what you like</p>
         <button type="submit">Select</button>
     </form>
-    <form method="get" action="/reservations">
+    <form class="form-select" method="get" action="/reservations">
         <h3>See Your Reservations</h3>
         <p>See all apartments you have booked</p>
         <button>Select</button>
     </form>
-    <form method="get" action="create">
+    <form class="form-select" method="get" action="create">
         <h3>Add Your Apartment</h3>
         <p>Become a host!</p>
         <button>Select</button>
     </form>
 
-    <form method="get" action="/manage">
+    <form class="form-select" method="get" action="/manage">
         <h3>Manage Your Apartments</h3>
         <p>Edit info / Remove</p>
         <button>Select</button>
     </form>
 </div>
 
-<style>
-    .container {
-        display: flex;
-        flex-direction: row;
 
-    }
-
-    h3 {
-        font-size: 24px;
-    }
-
-    form {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        width: 20%;
-        padding: 10px;
-        background-color: #FFA500D0;
-        margin: 10px;
-    }
-
-    button {
-        width: 70px;
-    }
-
-    .logout {
-        display: flex;
-        justify-content: start;
-        padding-left: 20px;
-        margin-bottom: 10px;
-    }
-
-</style>

@@ -1,12 +1,12 @@
 {{ include('header.html') }}
 <a href="/select">Back</a>
 <h2>My Apartments:</h2>
-<div class="container">
+<div class="container container-row">
 
     {% for apartment in apartments %}
     <div class="box">
 
-        <h3><a href="/index/{{ reservation.apartmentId }}">{{ apartment.name }}</a></h3>
+        <h3><a href="/index/{{ apartment.id }}">{{ apartment.name }}</a></h3>
         <p>{{ apartment.address}}</p>
         <p>{{ apartment.availableFrom}} / {{ apartment.availableTo }}</p>
         <div>
@@ -21,30 +21,3 @@
     </div>
     {% endfor %}
 </div>
-
-
-
-<style>
-
-    h2 {
-        text-align: center;
-    }
-    .container {
-        display: flex;
-        flex-direction: row;
-        justify-content: center;
-
-    }
-
-    .box {
-        align-self: center;
-        margin: 0px 15px 5px 15px;
-        padding: 10px;
-        border: 1px solid black;
-
-    }
-
-
-
-
-</style>
