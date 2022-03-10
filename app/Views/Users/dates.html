@@ -1,5 +1,8 @@
 {{ include('header.html') }}
-<a href="/select">Back</a>
+<div class="logout">
+    <a href="/logout">Log Out</a>
+</div>
+<a class="back" href="/select">Back</a>
 <div class="container">
     <h3>Select Dates:</h3>
     <form method="post" action="/dates/search" style="display: flex; flex-direction: column; width:40%">
@@ -8,7 +11,6 @@
         <label>Check-out date:</label>
         <input type="date" name="selected_to" id="tomorrow" min="tomorrow">
         <button type="submit" name="submit">Search</button>
-
     </form>
 
 </div>

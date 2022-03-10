@@ -1,5 +1,8 @@
 {{ include('header.html') }}
-<a href="/select">Back</a>
+<div class="logout">
+    <a href="/logout">Log Out</a>
+</div>
+<a class="back" href="/select">Back</a>
 
 <div class="container">
     <div class="image-large">image</div>
@@ -11,7 +14,7 @@
     <div class="comments-container">
         {% for comment in comments %}
         <div class="comment">
-            <p>{{ comment.userName }} {{ comment.userSurname }}</p>
+            <p class="name-surname">{{ comment.userName }} {{ comment.userSurname }}</p>
             <p>{{ comment.comment }}</p>
             <small>{{ comment.createdAt }}</small>
         </div>
@@ -19,7 +22,7 @@
     </div>
 
     <div class="comment comment-add">
-        <form method="post" action="/comment/{{ apartment.id }}">
+        <form class="just-button" method="post" action="/comment/{{ apartment.id }}">
             <p>{{ name }} {{ surname }}:</p>
             <textarea name="comment"></textarea>
             <button type="submit">ADD</button>

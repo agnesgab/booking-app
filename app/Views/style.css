@@ -6,6 +6,58 @@
     text-align: center;
 }
 
+.container-select {
+    display: flex;
+    flex-direction: row;
+
+}
+
+.comments-container {
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    width: 30%;
+}
+
+form:not(.just-button) {
+    display: flex;
+    flex-direction: column;
+    align-self: center;
+    width: 20%;
+}
+
+
+.form-select {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 20%;
+    height: 220px;
+    padding: 10px;
+    background-color: #FFA500D0;
+    margin: 10px;
+}
+
+button {
+    width: max-content;
+    margin: 5px 0px 5px 0px;
+    padding: 0 10px 0 10px;
+    align-self: center;
+}
+
+input {
+    margin-bottom: 5px;
+    width: 50%;
+    align-self: center;
+}
+
+.input-with-txt {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
 
 a {
     color: black;
@@ -17,50 +69,15 @@ a {
 
 h3 {
     text-align: center;
-    font-size: 24px;
+    font-size: 22px;
 }
 
-form {
-    display: flex;
-    flex-direction: column;
-    align-self: center;
-    width: 20%;
-}
 
-input {
-    margin-bottom: 5px;
-}
-
-.container-select {
-    display: flex;
-    flex-direction: row;
-
-}
-
-.form-select {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    width: 20%;
-    padding: 10px;
-    background-color: #FFA500D0;
-    margin: 10px;
-}
-
-button {
-    width: 70px;
-}
-
-.logout {
-    display: flex;
-    justify-content: start;
-    padding-left: 20px;
+.back {
+    padding-left: 40px;
     margin-bottom: 10px;
 }
 
-h2 {
-    text-align: center;
-}
 
 .container-row {
     display: flex;
@@ -71,11 +88,25 @@ h2 {
 
 .box {
     align-self: center;
-    margin: 0px 15px 5px 15px;
+    margin: 0px 20px 5px 20px;
     padding: 10px;
     border: 1px solid black;
+    width: 60%;
+    display: flex;
+    justify-content: space-between;
 
 }
+
+.apartment-card {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid black;
+    margin: 0px 20px 5px 20px;
+    padding: 10px;
+    align-content: center;
+}
+
+
 
 .image-large {
     width: 380px;
@@ -89,14 +120,9 @@ h2 {
     width: 70%;
 }
 
-.comments-container {
-    margin-top: 30px;
-    display: flex;
-    flex-direction: column;
-    align-content: center;
-    width: 30%;
+.name-surname {
+    font-weight: bold;
 }
-
 .comment {
     border: 1px solid orange;
     margin-bottom: 10px;
@@ -104,15 +130,23 @@ h2 {
 }
 
 .comment-add {
-    width: 60%;
+    width: 50%;
 }
 
 textarea {
-    width: 80%;
+    width: 60%;
+    height: 80px;
 }
 
 .price-a {
     font-size: 30px;
     margin: 0 5px 0px 30px;
     align-self: end;
+}
+
+.logout {
+    display: flex;
+    justify-content: end;
+    padding-right: 40px;
+    margin-bottom: 10px;
 }

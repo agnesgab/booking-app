@@ -1,22 +1,22 @@
 {{ include('header.html') }}
-<a href="/select">Back</a>
+<div class="logout">
+    <a href="/logout">Log Out</a>
+</div>
+<a class="back" href="/select">Back</a>
 <h2>My Reservations:</h2>
 <div class="container container-row">
 
     {% for reservation in reservations %}
-    <div class="box">
+    <div class="apartment-card">
 
         <h3><a href="/index/{{ reservation.apartmentId }}">{{ reservation.apartmentName }}</a></h3>
         <p>{{ reservation.apartmentAddress}}</p>
         <p>{{ reservation.dateFrom}} / {{ reservation.dateTo }}</p>
         <p>Total: {{ reservation.totalPrice }} EUR</p>
-        <div>
-
-            <form method="get" action="/cancel/{{ reservation.apartmentId }}">
+            <form class="just-button" method="get" action="/cancel/{{ reservation.apartmentId }}">
                 <button type="submit" onclick="confirm('Are you sure?')">Cancel Reservation</button>
             </form>
 
-        </div>
 
     </div>
     {% endfor %}
