@@ -25,8 +25,8 @@ class UsersController
     {
 
         $userEmail = $_POST['email'];
-        $password = $_POST['password'];
-        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+        //$password = $_POST['password'];
+        //$hashedPassword = password_hash($password, PASSWORD_DEFAULT);
         $emailQuery = Database::connection()
             ->createQueryBuilder()
             ->select('email')
@@ -45,7 +45,7 @@ class UsersController
                     'name' => $_POST['name'],
                     'surname' => $_POST['surname'],
                     'email' => $_POST['email'],
-                    'password' => $hashedPassword
+                    'password' => $_POST['password']
                 ]);
             return new View('Users/login.html');
         }
@@ -66,14 +66,13 @@ class UsersController
 
         $userEmail = $_POST['email'];
         $userPassword = $_POST['password'];
-
+        //password not used for testing purposes
         $userQuery = Database::connection()
             ->createQueryBuilder()
             ->select('*')
             ->from('users')
-            ->where('email = ?', 'password = ?')
+            ->where('email = ?')
             ->setParameter(0, $userEmail)
-            ->setParameter(1, $userPassword)
             ->executeQuery()
             ->fetchAllAssociative();
 
