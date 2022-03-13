@@ -5,18 +5,37 @@
 <a class="back" href="/select">Back</a>
 
 <div class="container">
+    <h2>{{ apartment.name }}</h2>
     <div class="image-large">image</div>
-    <h3>{{ apartment.name }}</h3>
+    {% if average_rating > 0 %}
+    <h3>Rating: {{ average_rating }}<span>★</span></h3>
+    {% else %}
+    <h3>Rating: 0<span>★</span></h3>
+    {% endif %}
     <p class="description">{{ apartment.description }}</p>
     <h3>Price per night: {{ apartment.price }}€</h3>
-    <form method="get" name="book" action="/book/{{ apartment.id }}"><button type="submit">BOOK</button></form>
+    <form method="get" name="book" action="/book/{{ apartment.id }}">
+        <button type="submit">BOOK</button>
+    </form>
 
     <div class="comments-container">
         {% for comment in comments %}
         <div class="comment">
             <p class="name-surname">{{ comment.userName }} {{ comment.userSurname }}</p>
+            <p>{{ comment.stars }}</p>
             <p>{{ comment.comment }}</p>
             <small>{{ comment.createdAt }}</small>
+            {% if user_id == comment.userId %}
+            <div class="container-row">
+
+                <form method="get" action="/edit/comment/{{ comment.id }}/{{ apartment.id }}">
+                    <button class="button-link" type="submit">edit</button>
+                </form>
+                <form method="post" action="/delete/comment/{{ comment.id }}/{{ apartment.id }}">
+                    <button class="button-link" type="submit" onclick="confirm('Are you sure?')">delete</button>
+                </form>
+            </div>
+            {% endif %}
         </div>
         {% endfor %}
     </div>
@@ -24,7 +43,22 @@
     <div class="comment comment-add">
         <form class="just-button" method="post" action="/comment/{{ apartment.id }}">
             <p>{{ name }} {{ surname }}:</p>
-            <textarea name="comment"></textarea>
+            <textarea name="comment" required></textarea>
+            {% if rating_not_exist %}
+            <div class="rate">
+                <p>Add rating: </p>
+                <input type="radio" id="star5" name="rate" value="5"/>
+                <label for="star5" title="text">5 stars</label>
+                <input type="radio" id="star4" name="rate" value="4"/>
+                <label for="star4" title="text">4 stars</label>
+                <input type="radio" id="star3" name="rate" value="3"/>
+                <label for="star3" title="text">3 stars</label>
+                <input type="radio" id="star2" name="rate" value="2"/>
+                <label for="star2" title="text">2 stars</label>
+                <input type="radio" id="star1" name="rate" value="1"/>
+                <label for="star1" title="text">1 star</label>
+            </div>
+            {% endif %}
             <button type="submit">ADD</button>
         </form>
     </div>

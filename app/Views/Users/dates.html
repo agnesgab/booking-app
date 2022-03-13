@@ -6,10 +6,10 @@
 <div class="container">
     <h3>Select Dates:</h3>
     <form method="post" action="/dates/search" style="display: flex; flex-direction: column; width:40%">
-        <label>Check-in date:</label>
-        <input type="date" name="selected_from" id="today" min="today">
-        <label>Check-out date:</label>
-        <input type="date" name="selected_to" id="tomorrow" min="tomorrow">
+        <label>Check-in date: </label>
+        <input class="input-date" type="date" name="selected_from" id="today" min="today" required>
+        <label>Check-out date: </label>
+        <input class="input-date" type="date" name="selected_to" id="tomorrow" min="tomorrow" required>
         <button type="submit" name="submit">Search</button>
     </form>
 

@@ -13,11 +13,9 @@
         <p>{{ reservation.apartmentAddress}}</p>
         <p>{{ reservation.dateFrom}} / {{ reservation.dateTo }}</p>
         <p>Total: {{ reservation.totalPrice }} EUR</p>
-            <form class="just-button" method="get" action="/cancel/{{ reservation.apartmentId }}">
-                <button type="submit" onclick="confirm('Are you sure?')">Cancel Reservation</button>
-            </form>
-
-
+        <form class="just-button" method="get" action="/cancel/{{ reservation.apartmentId }}">
+            <button type="submit" onclick="confirm('Are you sure?')">Cancel Reservation</button>
+        </form>
     </div>
     {% endfor %}
 </div>

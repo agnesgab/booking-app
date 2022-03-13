@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Database;
 use App\Models\Apartment;
 use App\Models\Comment;
+use App\Models\Rating;
 use App\View;
 use App\Redirect;
 use Carbon\CarbonPeriod;
@@ -25,7 +26,6 @@ class ApartmentsController
 
         $apartments = [];
 
-
         foreach ($apartmentsQuery as $apartmentData) {
 
             $apartments[] = new Apartment(
@@ -39,7 +39,9 @@ class ApartmentsController
                 $apartmentData['available_to']
             );
 
+
         }
+
 
         return new View('Apartments/index.html', ['apartments' => $apartments]);
 
@@ -73,6 +75,7 @@ class ApartmentsController
     public function show(array $vars)
     {
 
+
         $apartmentQuery = Database::connection()
             ->createQueryBuilder()
             ->select('*')
@@ -90,7 +93,7 @@ class ApartmentsController
             $apartmentQuery[0]['address'],
             $apartmentQuery[0]['description'],
             $apartmentQuery[0]['price'],
-            null,
+            $apartmentQuery[0]['owner_id'],
             $apartmentQuery[0]['available_from'],
             $apartmentQuery[0]['available_to']
 
@@ -124,7 +127,6 @@ class ApartmentsController
             ->executeQuery()
             ->fetchAllAssociative();
 
-
         $comments = [];
 
         foreach ($commentsQuery as $data) {
@@ -132,25 +134,81 @@ class ApartmentsController
                 $data['name'],
                 $data['surname'],
                 $data['comment'],
-                $data['created_at']
+                $data['created_at'],
+                $data['rating'],
+                $data['user_id'],
+                $data['apartment_id'],
+                $data['comment_id']
             );
         }
 
+
+        $ratingsQuery = Database::connection()
+            ->createQueryBuilder()
+            ->select('rating')
+            ->from('comments')
+            ->where('apartment_id = ?')
+            ->setParameter(0, $vars['id'])
+            ->executeQuery()
+            ->fetchAllAssociative();
+
+        $allRatings = [];
+
+
+        foreach ($ratingsQuery as $data) {
+
+            if ($data['rating'] !== null) {
+                $allRatings[] = (int)$data['rating'];
+            }
+        }
+
+        $averageRating = array_sum($allRatings) / count($allRatings);
+        $averageRating = number_format($averageRating, 1);
+
+        $userRatingAndCommentsQuery = Database::connection()
+            ->createQueryBuilder()
+            ->select('rating')
+            ->from('comments')
+            ->where('user_id = ?', 'apartment_id = ?')
+            ->setParameter(0, $_SESSION['id'])
+            ->setParameter(1, $vars['id'])
+            ->executeQuery()
+            ->fetchAllAssociative();
+
+
+        $count = 0;
+        $currentRating = null;
+        foreach ($userRatingAndCommentsQuery as $data) {
+            if ($data['rating'] !== null) {
+                $count++;
+                $currentRating = $data['rating'];
+            }
+
+
+        }
+
+        $ratingNotExist = $count === 0;
+
         return new View('Apartments/show.html', [
             'apartment' => $apartment,
+            'user_id' => $_SESSION['id'],
             'name' => $name,
             'surname' => $surname,
-            'comments' => $comments]);
+            'comments' => $comments,
+            'average_rating' => $averageRating,
+            'rating_not_exist' => $ratingNotExist,
+            'current_rating' => $currentRating
+        ]);
     }
 
 
-    public function dates()
+    public function dates(): View
     {
 
         return new View('Users/dates.html');
     }
 
-    public function showAvailable()
+    public function showAvailable(): View
     {
 
         $selectedFrom = \Carbon\Carbon::createFromFormat('Y-m-d', $_POST['selected_from']);
@@ -174,22 +232,22 @@ class ApartmentsController
 
         $availableId = [];
 
-        foreach ($apartmentsQuery as $apartment){
+        foreach ($apartmentsQuery as $apartment) {
 
             $range = CarbonPeriod::create(
                 $apartment['available_from'], $apartment['available_to']);
 
-            if($range->overlaps($selectedDatesRange)){
+            if ($range->overlaps($selectedDatesRange)) {
                 $availableId[] = (int)$apartment['id'];
             }
         }
 
-        foreach ($reservationsQuery as $reservation){
+        foreach ($reservationsQuery as $reservation) {
 
             $range = CarbonPeriod::create(
                 $reservation['reservation_date_from'], $reservation['reservation_date_to']);
 
-            if(!$range->overlaps($selectedDatesRange) && in_array($reservation['apartment_id'], $availableId)){
+            if (!$range->overlaps($selectedDatesRange) && in_array($reservation['apartment_id'], $availableId)) {
 
                 $availableId[] = (int)$reservation['apartment_id'];
             }
@@ -199,7 +257,7 @@ class ApartmentsController
         $availableId = array_unique($availableId);
         $availableApartments = [];
 
-        foreach ($availableId as $id){
+        foreach ($availableId as $id) {
 
             $availableApartmentsQuery = Database::connection()
                 ->createQueryBuilder()
@@ -210,7 +268,7 @@ class ApartmentsController
                 ->executeQuery()
                 ->fetchAllAssociative();
 
-            foreach ($availableApartmentsQuery as $data){
+            foreach ($availableApartmentsQuery as $data) {
 
                 $availableApartments[] = new Apartment(
                     $data['id'],
@@ -304,7 +362,7 @@ class ApartmentsController
         return new View('Apartments/edit.html', ['apartment' => $apartment]);
     }
 
-    public function saveChanges(array $vars)
+    public function saveChanges(array $vars): Redirect
     {
 
         Database::connection()->update('apartments', [

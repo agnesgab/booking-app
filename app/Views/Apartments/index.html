@@ -3,13 +3,14 @@
 <h3>All Apartments:</h3>
 <div class="container container-index">
     {% for apartment in apartments %}
-    <div class="box" >
+    <div class="box">
         <div class="image" style="width: 100px;height: 100px;background-color: cornflowerblue">image</div>
         <a href="/index/{{ apartment.id }}">{{ apartment.name }}</a>
-        <p class="price-a">{{ apartment.price }}€</p>
+        <div>
+            <p>{{ apartment.rating }}</p>
+            <p class="price-a">{{ apartment.price }}€</p>
+        </div>
+
     </div>
     {% endfor %}
 </div>
-
-
-

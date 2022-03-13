@@ -51,7 +51,9 @@ $dispatcher = FastRoute\simpleDispatcher(function (FastRoute\RouteCollector $r) 
 
     //comments
     $r->addRoute('POST', '/comment/{id:\d+}', ['App\Controllers\CommentsController', 'comment']);
-
+    $r->addRoute('POST', '/delete/comment/{id:\d+}/{apartment_id:\d+}', ['App\Controllers\CommentsController', 'delete']);
+    $r->addRoute('GET', '/edit/comment/{id:\d+}/{apartment_id:\d+}', ['App\Controllers\CommentsController', 'edit']);
+    $r->addRoute('POST', '/edit/comment/{id:\d+}/{apartment_id:\d+}', ['App\Controllers\CommentsController', 'saveChanges']);
 
 
 });

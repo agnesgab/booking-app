@@ -62,8 +62,8 @@ class ReservationsController
             ->createQueryBuilder()
             ->select('id')
             ->from('reservations')
-            ->where('user_id = ?','apartment_id = ?')
-            ->setParameter(0,$_SESSION['id'] )
+            ->where('user_id = ?', 'apartment_id = ?')
+            ->setParameter(0, $_SESSION['id'])
             ->setParameter(1, (int)$vars['id'])
             ->executeQuery()
             ->fetchOne();
@@ -135,11 +135,11 @@ class ReservationsController
 
     }
 
-    public function validateReservation(array $vars)
+    public function validateReservation(array $vars): Redirect
     {
 
-        $inputFrom = date("Y-m-d",strtotime($_POST['selected_from']));
-        $inputTo = date("Y-m-d",strtotime($_POST['selected_to']));
+        $inputFrom = date("Y-m-d", strtotime($_POST['selected_from']));
+        $inputTo = date("Y-m-d", strtotime($_POST['selected_to']));
 
         $selectedFrom = \Carbon\Carbon::createFromFormat('Y-m-d', $inputFrom);
         $selectedTo = \Carbon\Carbon::createFromFormat('Y-m-d', $inputTo);
@@ -147,7 +147,7 @@ class ReservationsController
 
         $selectedDates = [];
 
-        foreach ($selectedDatesRange as $date){
+        foreach ($selectedDatesRange as $date) {
             $selectedDates[] = $date->format('Y-m-d');
         }
 
@@ -223,7 +223,6 @@ class ReservationsController
         return new Redirect('/reservations');
 
     }
-
 
 
 }

@@ -4,7 +4,7 @@
 <div class="container">
     <p>{{ from }}/{{ to }}</p>
     {% for apartment in available_apartments %}
-    <div class="box" >
+    <div class="box">
         <div class="image" style="width: 100px;height: 100px;background-color: cornflowerblue">image</div>
         <a href="/index/{{ apartment.id }}">{{ apartment.name }}</a>
         <p class="price-a">{{ apartment.price }}€</p>

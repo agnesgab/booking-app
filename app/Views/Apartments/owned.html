@@ -2,20 +2,20 @@
 <a class="back" href="/select">Back</a>
 <h2>My Apartments:</h2>
 <div class="container container-row">
-
     {% for apartment in apartments %}
     <div class="apartment-card">
 
         <h3><a href="/index/{{ apartment.id }}">{{ apartment.name }}</a></h3>
         <p>{{ apartment.address}}</p>
         <p>{{ apartment.availableFrom}} / {{ apartment.availableTo }}</p>
+        <div class="container-row">
             <form class="just-button" method="get" action="/edit/{{ apartment.id }}">
                 <button>Edit</button>
-            </form >
-            <form class="just-button" method="post" action="/delete/{{ apartment.id }}"><button type="submit" onclick="confirm('Are you sure?')">Delete</button></form>
-
             </form>
-
+            <form class="just-button" method="post" action="/delete/{{ apartment.id }}">
+                <button type="submit" onclick="confirm('Are you sure?')">Delete</button>
+            </form>
+        </div>
     </div>
     {% endfor %}
 </div>

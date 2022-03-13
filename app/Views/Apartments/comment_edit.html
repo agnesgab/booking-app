@@ -1,0 +1,39 @@
+{{ include('header.html') }}
+<div class="logout">
+    <a href="/logout">Log Out</a>
+</div>
+<a class="back" href="/select">Back</a>
+
+<div class="container">
+    <h2>{{ apartment.name }}</h2>
+    <div class="image-large">image</div>
+    <h3>Rating: {{ average_rating }}<span>★</span></h3>
+    <p class="description">{{ apartment.description }}</p>
+    <h3>Price per night: {{ apartment.price }}€</h3>
+
+    <div class="comment comment-add">
+        <form class="just-button" method="post" action="/edit/comment/{{comment.id}}/{{apartment.id}}">
+            <p>{{ comment.userName }} {{ comment.userSurname }}:</p>
+            <textarea name="comment">{{ comment.comment }}</textarea>
+
+            {% if comment.rating > 0 %}
+            <div class="rate">
+                <p>Add rating: </p>
+                <input type="radio" id="star5" name="rate" value="5"/>
+                <label for="star5" title="text">5 stars</label>
+                <input type="radio" id="star4" name="rate" value="4"/>
+                <label for="star4" title="text">4 stars</label>
+                <input type="radio" id="star3" name="rate" value="3"/>
+                <label for="star3" title="text">3 stars</label>
+                <input type="radio" id="star2" name="rate" value="2"/>
+                <label for="star2" title="text">2 stars</label>
+                <input type="radio" id="star1" name="rate" value="1"/>
+                <label for="star1" title="text">1 star</label>
+            </div>
+            {% endif %}
+            <button type="submit">ADD</button>
+        </form>
+    </div>
+</div>
+
+
