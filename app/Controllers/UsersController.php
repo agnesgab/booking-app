@@ -3,50 +3,32 @@
 namespace App\Controllers;
 
 use App\Database;
+use App\Services\User\Store\UserStoreRequest;
+use App\Services\User\Store\UserStoreService;
+use App\Validation\LoginValidation;
+use App\Validation\SignupValidation;
 use App\View;
 use App\Redirect;
 
-
 class UsersController
 {
-
-
     /**
      * @throws \Doctrine\DBAL\Exception
      */
     public function signup(): View
     {
-
         return new View('Users/signup.html');
-
     }
 
     public function storeUser(): View
     {
+        $validation = new SignupValidation($_POST['email']);
 
-        $userEmail = $_POST['email'];
-        //$password = $_POST['password'];
-        //$hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-        $emailQuery = Database::connection()
-            ->createQueryBuilder()
-            ->select('email')
-            ->from('users')
-            ->where('email = ?')
-            ->setParameter(0, $userEmail)
-            ->executeQuery()
-            ->fetchAllAssociative();
+        if ($validation->validateEmail() < 1) {
+            $request = new UserStoreRequest($_POST['name'], $_POST['surname'], $_POST['email'], $_POST['password']);
+            $service = new UserStoreService();
+            $service->execute($request);
 
-
-
-
-        if (empty($emailQuery)) {
-            Database::connection()
-                ->insert('users', [
-                    'name' => $_POST['name'],
-                    'surname' => $_POST['surname'],
-                    'email' => $_POST['email'],
-                    'password' => $_POST['password']
-                ]);
             return new View('Users/login.html');
         }
 
@@ -56,28 +38,15 @@ class UsersController
 
     public function login(): View
     {
-
         return new View('Users/login.html');
-
     }
 
     public function startSession(): Redirect
     {
+        $validation = new LoginValidation($_POST['email'], $_POST['password']);
 
-        $userEmail = $_POST['email'];
-        $userPassword = $_POST['password'];
-        //password not used for testing purposes
-        $userQuery = Database::connection()
-            ->createQueryBuilder()
-            ->select('*')
-            ->from('users')
-            ->where('email = ?')
-            ->setParameter(0, $userEmail)
-            ->executeQuery()
-            ->fetchAllAssociative();
-
-        if (!empty($userQuery)) {
-            $_SESSION['id'] = (int)$userQuery[0]['id'];
+        if ($validation->validateLogin()) {
+            $_SESSION['id'] = $validation->getSessionId();
             return new Redirect('/select');
         }
 
@@ -93,8 +62,7 @@ class UsersController
     public function logout(): Redirect
     {
         session_destroy();
-        return new Redirect('/start');
+        return new Redirect('/');
     }
-
 
 }

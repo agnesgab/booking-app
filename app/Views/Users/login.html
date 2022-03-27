@@ -1,9 +1,11 @@
 {{ include('header.html') }}
-<a class="back" href="/start">Back</a>
+<a class="back" href="/">Back</a>
 <div class="container">
     <h3>Log In</h3>
-    <form method="post" action="/login">
+    <form class="form-userinfo" method="post" action="/login">
+        <label>E-mail:</label>
         <input type="email" name="email" placeholder="E-mail" required>
+        <label>Password:</label>
         <input type="password" name="password" placeholder="Password" required>
         <button type="submit" name="submit">LOGIN</button>
     </form>

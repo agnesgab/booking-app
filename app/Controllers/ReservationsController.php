@@ -2,74 +2,49 @@
 
 namespace App\Controllers;
 
-use App\Database;
-use App\Models\Apartment;
-use App\Models\Reservation;
 use App\Redirect;
+use App\Services\Price\Calculate\PriceCalculateRequest;
+use App\Services\Price\Calculate\PriceCalculateService;
+use App\Services\Reservation\Provide\ReservationProvideRequest;
+use App\Services\Reservation\Provide\ReservationProvideService;
+use App\Services\Reservation\ShowAll\ReservationShowAllRequest;
+use App\Services\Reservation\ShowAll\ReservationShowAllService;
+use App\Services\Reservation\Add\ReservationAddRequest;
+use App\Services\Reservation\Add\ReservationAddService;
+use App\Services\Reservation\Delete\ReservationDeleteRequest;
+use App\Services\Reservation\Delete\ReservationDeleteService;
+use App\Validation\ReservationValidation;
 use App\View;
-use Carbon\CarbonPeriod;
 
 class ReservationsController
 {
-
 
     /**
      * @throws \Doctrine\DBAL\Exception
      */
     public function index(): View
     {
+        $userId = (int)$_SESSION['id'];
+        $request = new ReservationShowAllRequest($userId);
+        $service = new ReservationShowAllService();
+        $response = $service->execute($request);
 
-        $myReservationsQuery = Database::connection()
-            ->createQueryBuilder()
-            ->select('*')
-            ->from('reservations', 'r')
-            ->innerJoin('r', 'apartments', 'a', 'r.apartment_id = a.id')
-            ->where('r.user_id = ?')
-            ->setParameter(0, (int)$_SESSION['id'])
-            ->executeQuery()
-            ->fetchAllAssociative();
-
-        $reservations = [];
-
-        foreach ($myReservationsQuery as $data) {
-            $reservations[] = new Reservation(
-                $data['user_id'],
-                $data['apartment_id'],
-                $data['name'],
-                $data['address'],
-                $data['reservation_date_from'],
-                $data['reservation_date_to'],
-                $data['total_price'],
-                $data['id']
-            );
-        }
-
-
-        return new View('Reservations/index.html', ['reservations' => $reservations]);
-
+        return new View('Reservations/index.html', ['reservations' => $response->getReservations()]);
     }
-
 
     public function show(): View
     {
-
         return new View('Reservations/show.html');
     }
 
     public function cancel(array $vars): Redirect
     {
-        $id = Database::connection()
-            ->createQueryBuilder()
-            ->select('id')
-            ->from('reservations')
-            ->where('user_id = ?', 'apartment_id = ?')
-            ->setParameter(0, $_SESSION['id'])
-            ->setParameter(1, (int)$vars['id'])
-            ->executeQuery()
-            ->fetchOne();
+        $userId = (int)$_SESSION['id'];
+        $apartmentId = (int)$vars['id'];
 
-        Database::connection()
-            ->delete('reservations', ['id' => (int)$id, 'user_id' => $_SESSION['id'], 'apartment_id' => (int)$vars['id']]);
+        $request = new ReservationDeleteRequest($userId, $apartmentId);
+        $service = new ReservationDeleteService();
+        $service->execute($request);
 
         return new Redirect('/reservations');
 
@@ -80,149 +55,37 @@ class ReservationsController
      */
     public function doReservation(array $vars): View
     {
+        $apartmentId = (int)$vars['id'];
+        $request = new ReservationProvideRequest($apartmentId);
+        $service = new ReservationProvideService();
+        $response = $service->execute($request);
 
-        $apartmentQuery = Database::connection()
-            ->createQueryBuilder()
-            ->select('*')
-            ->from('apartments')
-            ->where('id = ?')
-            ->setParameter(0, (int)$vars['id'])
-            ->executeQuery()
-            ->fetchAllAssociative();
-
-
-        $apartment = new Apartment(
-            $apartmentQuery[0]['id'],
-            $apartmentQuery[0]['name'],
-            $apartmentQuery[0]['address'],
-            $apartmentQuery[0]['description'],
-            $apartmentQuery[0]['price'],
-            null,
-            $apartmentQuery[0]['available_from'],
-            $apartmentQuery[0]['available_to'],
-
-        );
-
-        $reservationsQuery = Database::connection()
-            ->createQueryBuilder()
-            ->select('*')
-            ->from('reservations')
-            ->where('apartment_id = ?')
-            ->setParameter(0, (int)$vars['id'])
-            ->executeQuery()
-            ->fetchAllAssociative();
-
-        $apartmentReservationRanges = [];
-
-        foreach ($reservationsQuery as $reservation) {
-            $apartmentReservationRanges[] = CarbonPeriod::create(
-                $reservation['reservation_date_from'], $reservation['reservation_date_to']);
-
-        }
-
-        $unavailableDates = [];
-
-
-        foreach ($apartmentReservationRanges as $range) {
-
-            foreach ($range as $date) {
-                $unavailableDates[] = $date->format('m-d-Y');
-            }
-        }
-
-
-        return new View('Apartments/reservation.html', ['apartment' => $apartment, 'dates' => $unavailableDates]);
+        return new View('Apartments/reservation.html', ['apartment' => $response->getApartment(), 'dates' => $response->getUnavailableDates()]);
 
     }
 
     public function validateReservation(array $vars): Redirect
     {
+        $inputDateFrom = date("Y-m-d", strtotime($_POST['selected_from']));
+        $inputDateTo = date("Y-m-d", strtotime($_POST['selected_to']));
+        $apartmentId = (int)$vars['id'];
+        $userId = $_SESSION['id'];
+        $validation = new ReservationValidation($apartmentId, $inputDateFrom, $inputDateTo);
+        $validation->validateDates();
 
-        $inputFrom = date("Y-m-d", strtotime($_POST['selected_from']));
-        $inputTo = date("Y-m-d", strtotime($_POST['selected_to']));
+        if ($validation->getOverlaps() < 1) {
 
-        $selectedFrom = \Carbon\Carbon::createFromFormat('Y-m-d', $inputFrom);
-        $selectedTo = \Carbon\Carbon::createFromFormat('Y-m-d', $inputTo);
-        $selectedDatesRange = CarbonPeriod::create($selectedFrom, $selectedTo);
+            $priceRequest = new PriceCalculateRequest($apartmentId, $validation->getSelectedDatesRange());
+            $priceService = new PriceCalculateService();
+            $priceResponse = $priceService->execute($priceRequest);
 
-        $selectedDates = [];
-
-        foreach ($selectedDatesRange as $date) {
-            $selectedDates[] = $date->format('Y-m-d');
-        }
-
-        $apartmentQuery = Database::connection()
-            ->createQueryBuilder()
-            ->select('*')
-            ->from('apartments')
-            ->where('id = ?')
-            ->setParameter(0, (int)$vars['id'])
-            ->executeQuery()
-            ->fetchAllAssociative();
-
-
-        foreach ($apartmentQuery as $data) {
-            $availableDatesRange = CarbonPeriod::create($data['available_from'], $data['available_to']);
-        }
-
-
-        $reservationsQuery = Database::connection()
-            ->createQueryBuilder()
-            ->select('*')
-            ->from('reservations')
-            ->where('apartment_id = ?')
-            ->setParameter(0, (int)$vars['id'])
-            ->executeQuery()
-            ->fetchAllAssociative();
-
-        $apartmentReservationRanges = [];
-
-        foreach ($reservationsQuery as $reservation) {
-            $apartmentReservationRanges[] = CarbonPeriod::create(
-                $reservation['reservation_date_from'], $reservation['reservation_date_to']);
+            $request = new ReservationAddRequest((int)$vars['id'], $userId,
+                $inputDateFrom, $inputDateTo, $priceResponse->getTotalPrice());
+            $service = new ReservationAddService();
+            $service->execute($request);
 
         }
-
-        $count = 0;
-
-        foreach ($apartmentReservationRanges as $range) {
-
-            if (!$selectedDatesRange->overlaps($availableDatesRange) || $selectedDatesRange->overlaps($range)) {
-                $count += 1;
-            }
-        }
-
-
-        if ($count < 1) {
-
-            $priceQuery = Database::connection()
-                ->createQueryBuilder()
-                ->select('price')
-                ->from('apartments')
-                ->where('id = ?')
-                ->setParameter(0, (int)$vars['id'])
-                ->executeQuery()
-                ->fetchOne();
-
-
-            $days = count($selectedDates);
-            $totalPrice = (int)$priceQuery * $days;
-
-            Database::connection()
-                ->insert('reservations', [
-                    'apartment_id' => (int)$vars['id'],
-                    'user_id' => $_SESSION['id'],
-                    'reservation_date_from' => $inputFrom,
-                    'reservation_date_to' => $inputTo,
-                    'total_price' => $totalPrice
-                ]);
-
-        }
-
-
         return new Redirect('/reservations');
-
     }
-
 
 }

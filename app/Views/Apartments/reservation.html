@@ -5,8 +5,7 @@
     <h3>{{ apartment.name }}</h3>
     <h3>Price per night: {{ apartment.price }} EUR</h3>
     <p>{{ apartment.address }}</p>
-    <form method="post" action="/validation/{{ apartment.id }}"
-          style="display: flex; flex-direction: column; width:40%">
+    <form class="form-userinfo" method="post" action="/validation/{{ apartment.id }}">
         {{ include('datepicker.html') }}
         <button type="submit" name="submit">ADD</button>
     </form>

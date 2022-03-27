@@ -11,7 +11,7 @@ session_start();
 
 $dispatcher = FastRoute\simpleDispatcher(function (FastRoute\RouteCollector $r) {
     //register and login
-    $r->addRoute('GET', '/start', ['App\Controllers\SignupController', 'start']);
+    $r->addRoute('GET', '/', ['App\Controllers\SignupController', 'start']);
     $r->addRoute('GET', '/signup', ['App\Controllers\UsersController', 'signup']);
     $r->addRoute('POST', '/signup', ['App\Controllers\UsersController', 'storeUser']);
     $r->addRoute('GET', '/login', ['App\Controllers\UsersController', 'login']);

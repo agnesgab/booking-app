@@ -10,15 +10,8 @@
     display: flex;
     flex-direction: row;
 
-
 }
 
-.container-create {
-    display: flex;
-    justify-content: center;
-    width: 60%;
-
-}
 
 .comments-container {
     margin-top: 30px;
@@ -28,30 +21,44 @@
     width: 30%;
 }
 
-form:not(.just-button) {
-    display: flex;
-    flex-direction: column;
-    align-self: center;
-    width: 20%;
-    margin: 5px;
+
+.form-userinfo {
+        display: flex;
+        flex-direction: column;
+        align-self: center;
+        width: 20%;
+        margin: 5px;
+        font-weight: bold;
+        text-align: left;
 }
 
+.form-userinfo input {
+    margin: 2px 0 10px 0;
+}
 
-
-.form-select {
+.select-form {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    width: 20%;
-    height: 220px;
-    padding: 10px;
-    background-color: #FFA500D0;
+    background-color: rgba(255, 165, 0, 0.82);
     margin: 10px;
+    width: 300px;
+    height: 230px;
+    padding: 10px;
     transition: transform 330ms ease-in-out;
+
 }
 
-.form-select:hover {
-    transform: translateY(-5px);
+.select-form:hover {
+    transform: scale(1.04);
+}
+
+.select-form button {
+    justify-self: end;
+}
+
+.select-form h3 {
+    font-size: 22px;
 }
 
 button {
@@ -63,9 +70,6 @@ button {
     transition: transform 330ms ease-in-out;
 }
 
-button:hover {
-    font-size: large;
-}
 
 .button-link {
     background: none;
@@ -76,28 +80,13 @@ button:hover {
     cursor: pointer;
 }
 
+
 input {
     margin-bottom: 5px;
     width: 100%;
     align-self: center;
 }
 
-.input-date {
-    width: 50%;
-}
-
-.form-create {
-    display: flex;
-    width: 30%;
-    flex-direction: column;
-    justify-content: center;
-    align-content: center;
-    align-self: center;
-}
-
-.form-create div {
-    margin-bottom: 10px;
-}
 
 #description {
     height: 100px;
@@ -111,6 +100,7 @@ input {
 .create-dates {
     display: flex;
     flex-direction: column;
+    text-align: center;
 }
 .date-create {
     width: 40%;
@@ -129,6 +119,10 @@ a {
     padding: 15px 25px;
     text-decoration: none;
     margin: 20px 10px 20px 10px;
+}
+
+.start-link:hover {
+    color: black;
 }
 
 
@@ -156,6 +150,10 @@ h2 {
 
 }
 
+.container-row form {
+    margin: 0 2px;
+}
+
 .box {
     align-self: center;
     margin: 0 20px 5px 20px;
@@ -171,16 +169,15 @@ h2 {
     display: flex;
     flex-direction: column;
     border: 1px solid black;
-    margin: 0 20px 5px 20px;
+    margin: 10px 20px 5px 20px;
     padding: 10px;
     align-content: center;
-    transition: transform 330ms ease-in-out;
-    background-color: cornflowerblue;
 }
 
-.apartment-card:hover {
-    transform: translateY(-5px);
+.apartment-card button {
+    margin: 5px;
 }
+
 
 
 .image-large {
@@ -228,9 +225,6 @@ textarea {
     margin-bottom: 10px;
 }
 
-.date-label {
-    margin-right: 10px;
-}
 
 .rate {
     float: left;

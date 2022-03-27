@@ -6,99 +6,56 @@ use App\Database;
 use App\Models\Apartment;
 use App\Models\Comment;
 use App\Redirect;
+use App\Services\Comment\Add\CommentAddRequest;
+use App\Services\Comment\Add\CommentAddService;
+use App\Services\Comment\Delete\CommentDeleteRequest;
+use App\Services\Comment\Delete\CommentDeleteService;
+use App\Services\Comment\Edit\CommentEditRequest;
+use App\Services\Comment\Edit\CommentEditService;
+use App\Services\Comment\Update\CommentUpdateRequest;
+use App\Services\Comment\Update\CommentUpdateService;
 use App\View;
+use http\Env\Request;
 
 
 class CommentsController
 {
-
     public function comment(array $vars): Redirect
     {
-
-        Database::connection()
-            ->insert('comments', [
-                'apartment_id' => $vars['id'],
-                'user_id' => $_SESSION['id'],
-                'comment' => $_POST['comment'],
-                'rating' => $_POST['rate'],
-            ]);
+        $request = new CommentAddRequest($vars['id'], $_SESSION['id'], $_POST['comment'], $_POST['rate']);
+        $service = new CommentAddService();
+        $service->execute($request);
 
         return new Redirect('/index/' . $vars['id']);
     }
 
     public function delete(array $vars): Redirect
     {
-
-        Database::connection()
-            ->delete('comments', ['user_id' => $_SESSION['id'], 'comment_id' => (int)$vars['id']]);
+        $request = new CommentDeleteRequest($_SESSION['id'], (int)$vars['id']);
+        $service = new CommentDeleteService();
+        $service->execute($request);
 
         return new Redirect('/index/' . $vars['apartment_id']);
     }
 
     public function edit(array $vars): View
     {
-        $commentQuery = Database::connection()
-            ->createQueryBuilder()
-            ->select('*')
-            ->from('comments', 'c')
-            ->innerJoin('c', 'users', 'u', 'c.user_id = u.id')
-            ->where('comment_id = ?')
-            ->setParameter(0, $vars['id'])
-            ->executeQuery()
-            ->fetchAllAssociative();
+        $commentId = (int)$vars['id'];
+        $apartmentId = (int)$vars['apartment_id'];
+        $request = new CommentEditRequest($commentId, $apartmentId);
+        $service = new CommentEditService();
+        $response = $service->execute($request);
 
-        $apartmentQuery = Database::connection()
-            ->createQueryBuilder()
-            ->select('*')
-            ->from('apartments')
-            ->where('id = ?')
-            ->setParameter(0, $vars['apartment_id'])
-            ->executeQuery()
-            ->fetchAllAssociative();
-
-        $apartment = [];
-
-        foreach ($apartmentQuery as $data) {
-            $apartment = new Apartment(
-                $data['id'],
-                $data['name'],
-                $data['address'],
-                $data['description'],
-                $data['price']
-            );
-        }
-
-
-        $comment = [];
-
-        foreach ($commentQuery as $data) {
-            $comment = new Comment(
-                $data['name'],
-                $data['surname'],
-                $data['comment'],
-                $data['created_at'],
-                (int)$data['rating'],
-                $data['user_id'],
-                $data['apartment_id'],
-                $data['comment_id']
-
-            );
-        }
-
-
-        return new View('Apartments/comment_edit.html', ['comment' => $comment, 'apartment' => $apartment]);
+        return new View('Apartments/comment_edit.html', ['comment' => $response->getComment(), 'apartment' => $response->getApartment()]);
     }
 
     public function saveChanges(array $vars): Redirect
     {
-        Database::connection()->update('comments', [
-            'comment' => $_POST['comment'],
-            'rating' => $_POST['rate']
-        ], ['comment_id' => (int)$vars['id']]);
-
+        $request = new CommentUpdateRequest((int)$vars['id'], $_POST['comment'], $_POST['rate']);
+        $service = new CommentUpdateService();
+        $service->execute($request);
 
         return new Redirect('/index/' . $vars['apartment_id']);
     }
-
 
 }
