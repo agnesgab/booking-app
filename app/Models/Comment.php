@@ -4,8 +4,6 @@ namespace App\Models;
 
 class Comment
 {
-
-
     private ?int $id;
     private string $userName;
     private string $userSurname;
@@ -16,7 +14,6 @@ class Comment
     private ?int $apartmentId;
     private string $stars;
 
-
     /**
      * @param string $userName
      * @param string $userSurname
@@ -25,7 +22,6 @@ class Comment
      */
     public function __construct(string $userName, string $userSurname, string $comment, string $createdAt, ?string $rating = null, ?int $userId = null, ?int $apartmentId = null, ?int $id = null)
     {
-
         $this->comment = $comment;
         $this->createdAt = $createdAt;
         $this->userName = $userName;
@@ -51,7 +47,6 @@ class Comment
     {
         return $this->id;
     }
-
 
     /**
      * @return int
@@ -109,6 +104,5 @@ class Comment
         $this->stars = str_repeat('★', $this->getRating());
         return $this->stars;
     }
-
 
 }

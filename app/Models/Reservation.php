@@ -4,7 +4,6 @@ namespace App\Models;
 
 class Reservation
 {
-
     private int $userId;
     private int $apartmentId;
     private string $apartmentName;
@@ -24,16 +23,10 @@ class Reservation
      * @param ?int $id
      */
     public function __construct(
-        int    $userId,
-        int    $apartmentId,
-        string $apartmentName,
-        string $apartmentAddress,
-        string $dateFrom,
-        string $dateTo,
-        ?int   $totalPrice,
-        ?int   $id = null)
+        int    $userId, int $apartmentId, string $apartmentName, string $apartmentAddress,
+        string $dateFrom, string $dateTo, ?int $totalPrice, ?int $id = null
+    )
     {
-
         $this->userId = $userId;
         $this->apartmentId = $apartmentId;
         $this->apartmentName = $apartmentName;
@@ -41,8 +34,6 @@ class Reservation
         $this->dateFrom = $dateFrom;
         $this->dateTo = $dateTo;
         $this->id = $id;
-
-
         $this->totalPrice = $totalPrice;
     }
 
@@ -109,6 +100,5 @@ class Reservation
     {
         return $this->totalPrice;
     }
-
 
 }
