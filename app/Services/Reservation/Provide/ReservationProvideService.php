@@ -2,22 +2,27 @@
 
 namespace App\Services\Reservation\Provide;
 
-use App\Database;
 use App\Models\Apartment;
+use App\Repositories\Apartment\ApartmentRepository;
+use App\Repositories\Apartment\MysqlApartmentRepository;
+use App\Repositories\Reservation\MysqlReservationRepository;
+use App\Repositories\Reservation\ReservationRepository;
 use Carbon\CarbonPeriod;
 
 class ReservationProvideService {
 
+    private ReservationRepository $reservationRepository;
+    private ApartmentRepository $apartmentRepository;
+
+    public function __construct()
+    {
+        $this->reservationRepository = new MysqlReservationRepository();
+        $this->apartmentRepository = new MysqlApartmentRepository();
+    }
+
     public function execute(ReservationProvideRequest $request): ReservationProvideResponse
     {
-        $apartmentQuery = Database::connection()
-            ->createQueryBuilder()
-            ->select('*')
-            ->from('apartments')
-            ->where('id = ?')
-            ->setParameter(0, $request->getApartmentId())
-            ->executeQuery()
-            ->fetchAllAssociative();
+        $apartmentQuery = $this->apartmentRepository->show($request->getApartmentId());
 
         $apartment = new Apartment(
             $apartmentQuery[0]['id'],
@@ -31,17 +36,9 @@ class ReservationProvideService {
 
         );
 
-        $reservationsQuery = Database::connection()
-            ->createQueryBuilder()
-            ->select('*')
-            ->from('reservations')
-            ->where('apartment_id = ?')
-            ->setParameter(0, $request->getApartmentId())
-            ->executeQuery()
-            ->fetchAllAssociative();
+        $reservationsQuery = $this->reservationRepository->getAllApartmentReservations($request->getApartmentId());
 
         $apartmentReservationRanges = [];
-
         foreach ($reservationsQuery as $reservation) {
             $apartmentReservationRanges[] = CarbonPeriod::create(
                 $reservation['reservation_date_from'], $reservation['reservation_date_to']);
@@ -49,7 +46,6 @@ class ReservationProvideService {
         }
 
         $unavailableDates = [];
-
         foreach ($apartmentReservationRanges as $range) {
             foreach ($range as $date) {
                 $unavailableDates[] = $date->format('m-d-Y');

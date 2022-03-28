@@ -2,22 +2,35 @@
 
 namespace App\Services\Apartment\Show;
 
-use App\Database;
 use App\Models\Apartment;
 use App\Models\Comment;
+use App\Repositories\Apartment\ApartmentRepository;
+use App\Repositories\Apartment\MysqlApartmentRepository;
+use App\Repositories\Comment\CommentRepository;
+use App\Repositories\Comment\MysqlCommentRepository;
+use App\Repositories\Rating\MysqlRatingRepository;
+use App\Repositories\Rating\RatingRepository;
+use App\Repositories\User\MysqlUserRepository;
+use App\Repositories\User\UserRepository;
 
 class ApartmentShowService {
 
+    private ApartmentRepository $apartmentRepository;
+    private UserRepository $userRepository;
+    private CommentRepository $commentRepository;
+    private RatingRepository $ratingRepository;
+
+    public function __construct(){
+
+        $this->apartmentRepository = new MysqlApartmentRepository();
+        $this->userRepository = new MysqlUserRepository();
+        $this->commentRepository = new MysqlCommentRepository();
+        $this->ratingRepository = new MysqlRatingRepository();
+    }
+
     public function execute(ApartmentShowRequest $request): ApartmentShowResponse {
 
-        $apartmentQuery = Database::connection()
-            ->createQueryBuilder()
-            ->select('*')
-            ->from('apartments')
-            ->where('id = ?')
-            ->setParameter(0, $request->getApartmentId())
-            ->executeQuery()
-            ->fetchAllAssociative();
+        $apartmentQuery = $this->apartmentRepository->show($request->getApartmentId());
 
         $apartment = new Apartment(
             $apartmentQuery[0]['id'],
@@ -30,36 +43,18 @@ class ApartmentShowService {
             $apartmentQuery[0]['available_to']
         );
 
-        $userNameSurnameQuery = Database::connection()
-            ->createQueryBuilder()
-            ->select('*')
-            ->from('users')
-            ->where('id = ?')
-            ->setParameter(0, $request->getSessionId())
-            ->executeQuery()
-            ->fetchAllAssociative();
+        $userNameSurnameQuery = $this->userRepository->show($request->getSessionId());
 
         $name = '';
         $surname = '';
-
         foreach ($userNameSurnameQuery as $data) {
             $name = $data['name'];
             $surname = $data['surname'];
         }
 
-        $commentsQuery = Database::connection()
-            ->createQueryBuilder()
-            ->select('*')
-            ->from('comments', 'c')
-            ->innerJoin('c', 'users', 'u',
-                'c.user_id = u.id')
-            ->where('apartment_id = ?')
-            ->setParameter(0, $request->getApartmentId())
-            ->executeQuery()
-            ->fetchAllAssociative();
+        $commentsQuery = $this->commentRepository->showApartmentComments($request->getApartmentId());
 
         $comments = [];
-
         foreach ($commentsQuery as $data) {
             $comments[] = new Comment(
                 $data['name'],
@@ -73,19 +68,10 @@ class ApartmentShowService {
             );
         }
 
-        $ratingsQuery = Database::connection()
-            ->createQueryBuilder()
-            ->select('rating')
-            ->from('comments')
-            ->where('apartment_id = ?')
-            ->setParameter(0, $request->getApartmentId())
-            ->executeQuery()
-            ->fetchAllAssociative();
+        $ratingsQuery = $this->ratingRepository->getApartmentRatings($request->getApartmentId());
 
         $allRatings = [];
-
         foreach ($ratingsQuery as $data) {
-
             if ($data['rating'] !== null) {
                 $allRatings[] = (int)$data['rating'];
             }
@@ -98,16 +84,7 @@ class ApartmentShowService {
             $averageRating = 0;
         }
 
-        $userRatingAndCommentsQuery = Database::connection()
-            ->createQueryBuilder()
-            ->select('rating')
-            ->from('comments')
-            ->where('user_id = ?', 'apartment_id = ?')
-            ->setParameter(0, $request->getSessionId())
-            ->setParameter(1, $request->getApartmentId())
-            ->executeQuery()
-            ->fetchAllAssociative();
-
+        $userRatingAndCommentsQuery = $this->commentRepository->showUsersComments($request->getSessionId(), $request->getApartmentId());
 
         $count = 0;
         $currentRating = null;

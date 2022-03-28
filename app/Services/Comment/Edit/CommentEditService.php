@@ -2,35 +2,28 @@
 
 namespace App\Services\Comment\Edit;
 
-use App\Database;
 use App\Models\Apartment;
 use App\Models\Comment;
+use App\Repositories\Apartment\MysqlApartmentRepository;
+use App\Repositories\Comment\MysqlCommentRepository;
 
 class CommentEditService {
 
+    private MysqlCommentRepository $commentRepository;
+    private MysqlApartmentRepository $apartmentRepository;
+
+    public function __construct(){
+
+        $this->commentRepository = new MysqlCommentRepository();
+        $this->apartmentRepository = new MysqlApartmentRepository();
+    }
+
     public function execute(CommentEditRequest $request){
 
-        $commentQuery = Database::connection()
-            ->createQueryBuilder()
-            ->select('*')
-            ->from('comments', 'c')
-            ->innerJoin('c', 'users', 'u', 'c.user_id = u.id')
-            ->where('comment_id = ?')
-            ->setParameter(0, $request->getCommentId())
-            ->executeQuery()
-            ->fetchAllAssociative();
-
-        $apartmentQuery = Database::connection()
-            ->createQueryBuilder()
-            ->select('*')
-            ->from('apartments')
-            ->where('id = ?')
-            ->setParameter(0, $request->getApartmentId())
-            ->executeQuery()
-            ->fetchAllAssociative();
+        $commentQuery = $this->commentRepository->edit($request->getCommentId());
+        $apartmentQuery = $this->apartmentRepository->show($request->getApartmentId());
 
         $apartment = null;
-
         foreach ($apartmentQuery as $data) {
             $apartment = new Apartment(
                 $data['id'],
@@ -42,7 +35,6 @@ class CommentEditService {
         }
 
         $comment = null;
-
         foreach ($commentQuery as $data) {
             $comment = new Comment(
                 $data['name'],

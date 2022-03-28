@@ -7,9 +7,9 @@ class CommentAddRequest {
     private int $apartmentId;
     private int $userId;
     private string $commentText;
-    private int $rating;
+    private ?int $rating;
 
-    public function __construct(int $apartmentId, int $userId, string $commentText, int $rating)
+    public function __construct(int $apartmentId, int $userId, string $commentText, ?int $rating = null)
     {
         $this->apartmentId = $apartmentId;
         $this->userId = $userId;
@@ -26,9 +26,9 @@ class CommentAddRequest {
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getRating(): int
+    public function getRating(): ?int
     {
         return $this->rating;
     }

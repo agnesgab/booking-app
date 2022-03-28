@@ -10,8 +10,9 @@ class ApartmentUpdateRequest {
     private string $description;
     private string $availableFrom;
     private string $availableTo;
+    private int $price;
 
-    public function __construct(int $apartmentId, string $name, string $address, string $description, string $availableFrom, string $availableTo)
+    public function __construct(int $apartmentId, string $name, string $address, string $description, string $availableFrom, string $availableTo, int $price)
     {
         $this->apartmentId = $apartmentId;
         $this->name = $name;
@@ -19,6 +20,7 @@ class ApartmentUpdateRequest {
         $this->description = $description;
         $this->availableFrom = $availableFrom;
         $this->availableTo = $availableTo;
+        $this->price = $price;
     }
 
     /**
@@ -67,6 +69,14 @@ class ApartmentUpdateRequest {
     public function getAvailableFrom(): string
     {
         return $this->availableFrom;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPrice(): int
+    {
+        return $this->price;
     }
 
 }

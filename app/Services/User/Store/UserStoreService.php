@@ -3,18 +3,24 @@
 namespace App\Services\User\Store;
 
 use App\Database;
+use App\Models\User;
+use App\Repositories\User\MysqlUserRepository;
+use App\Repositories\User\UserRepository;
 
 class UserStoreService {
 
+    private UserRepository $userRepository;
+
+    public function __construct()
+    {
+        $this->userRepository = new MysqlUserRepository();
+    }
+
     public function execute(UserStoreRequest $request){
 
-        Database::connection()
-            ->insert('users', [
-                'name' => $request->getName(),
-                'surname' => $request->getSurname(),
-                'email' => $request->getEmail(),
-                'password' => $request->getPassword()
-            ]);
+        $user = new User($request->getName(), $request->getSurname(), $request->getPassword(), $request->getEmail());
+        $this->userRepository->store($user);
+
     }
 
 }

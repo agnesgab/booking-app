@@ -137,7 +137,7 @@ class ApartmentsController
     public function saveChanges(array $vars): Redirect
     {
         $request = new ApartmentUpdateRequest((int)$vars['id'], $_POST['name'], $_POST['address'], $_POST['description'],
-            $_POST['available_from'], $_POST['available_to']);
+            $_POST['available_from'], $_POST['available_to'], $_POST['price']);
         $service = new ApartmentUpdateService();
         $service->execute($request);
 

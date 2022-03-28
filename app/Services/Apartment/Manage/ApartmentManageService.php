@@ -2,25 +2,26 @@
 
 namespace App\Services\Apartment\Manage;
 
-use App\Database;
 use App\Models\Apartment;
+use App\Repositories\Apartment\ApartmentRepository;
+use App\Repositories\Apartment\MysqlApartmentRepository;
 
 class ApartmentManageService {
 
+    private ApartmentRepository $apartmentRepository;
+
+    public function __construct(){
+
+        $this->apartmentRepository = new MysqlApartmentRepository();
+    }
+
     public function execute(ApartmentManageRequest $request){
 
-        $myApartmentsQuery = Database::connection()
-            ->createQueryBuilder()
-            ->select('*')
-            ->from('apartments')
-            ->where('owner_id = ?')
-            ->setParameter(0, $request->getUserId())
-            ->executeQuery()
-            ->fetchAllAssociative();
+        $apartmentsInfo = $this->apartmentRepository->manage($request->getUserId());
 
         $apartments = [];
 
-        foreach ($myApartmentsQuery as $data) {
+        foreach ($apartmentsInfo as $data) {
             $apartments[] = new Apartment(
                 $data['id'],
                 $data['name'],

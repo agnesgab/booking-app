@@ -3,11 +3,19 @@
 namespace App\Services\Price\Calculate;
 
 use App\Database;
+use App\Repositories\Price\MysqlPriceRepository;
+use App\Repositories\Price\PriceRepository;
 
 class PriceCalculateService {
 
     private array $selectedDates;
     private int $totalPrice;
+    private PriceRepository $priceRepository;
+
+    public function __construct()
+    {
+        $this->priceRepository = new MysqlPriceRepository();
+    }
 
     public function execute(PriceCalculateRequest $request): PriceCalculateResponse {
 
@@ -15,14 +23,7 @@ class PriceCalculateService {
             $this->selectedDates[] = $date->format('Y-m-d');
         }
 
-        $priceQuery = Database::connection()
-            ->createQueryBuilder()
-            ->select('price')
-            ->from('apartments')
-            ->where('id = ?')
-            ->setParameter(0, $request->getApartmentId())
-            ->executeQuery()
-            ->fetchOne();
+        $priceQuery = $this->priceRepository->getPrice($request->getApartmentId());
 
         $days = count($this->getSelectedDates())-1;
         $this->totalPrice = (int)$priceQuery * $days;

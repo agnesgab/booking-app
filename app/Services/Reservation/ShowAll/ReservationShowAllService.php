@@ -4,23 +4,28 @@ namespace App\Services\Reservation\ShowAll;
 
 use App\Database;
 use App\Models\Reservation;
+use App\Repositories\Apartment\ApartmentRepository;
+use App\Repositories\Apartment\MysqlApartmentRepository;
+use App\Repositories\Reservation\MysqlReservationRepository;
+use App\Repositories\Reservation\ReservationRepository;
 
 class ReservationShowAllService {
 
+    private ReservationRepository $reservationRepository;
+    private ApartmentRepository $apartmentRepository;
+
+    public function __construct()
+    {
+        $this->reservationRepository = new MysqlReservationRepository();
+        $this->apartmentRepository = new MysqlApartmentRepository();
+    }
+
+
     public function execute(ReservationShowAllRequest $request): ReservationShowAllResponse
     {
-        $myReservationsQuery = Database::connection()
-            ->createQueryBuilder()
-            ->select('*')
-            ->from('reservations', 'r')
-            ->innerJoin('r', 'apartments', 'a', 'r.apartment_id = a.id')
-            ->where('r.user_id = ?')
-            ->setParameter(0, $request->getUserId())
-            ->executeQuery()
-            ->fetchAllAssociative();
+        $myReservationsQuery = $this->reservationRepository->getUserReservations($request->getUserId());
 
         $reservations = [];
-
         foreach ($myReservationsQuery as $data) {
             $reservations[] = new Reservation(
                 $data['user_id'],

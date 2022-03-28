@@ -3,24 +3,22 @@
 namespace App\Services\Reservation\Delete;
 
 use App\Database;
+use App\Repositories\Reservation\MysqlReservationRepository;
+use App\Repositories\Reservation\ReservationRepository;
 
 class ReservationDeleteService
 {
+    private ReservationRepository $reservationRepository;
+
+    public function __construct()
+    {
+        $this->reservationRepository = new MysqlReservationRepository();
+    }
+
     public function execute(ReservationDeleteRequest $request)
     {
-        $reservationId = Database::connection()
-            ->createQueryBuilder()
-            ->select('id')
-            ->from('reservations')
-            ->where('user_id = ?', 'apartment_id = ?')
-            ->setParameter(0, $request->getUserId())
-            ->setParameter(1, $request->getApartmentId())
-            ->executeQuery()
-            ->fetchOne();
+        $this->reservationRepository->delete($request->getUserId(), $request->getApartmentId());
 
-        Database::connection()
-            ->delete('reservations',
-                ['id' => $reservationId, 'user_id' => $request->getUserId(), 'apartment_id' => $request->getApartmentId()]);
     }
 
 }

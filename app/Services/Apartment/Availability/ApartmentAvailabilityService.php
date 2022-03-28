@@ -2,12 +2,24 @@
 
 namespace App\Services\Apartment\Availability;
 
-use App\Database;
 use App\Models\Apartment;
+use App\Repositories\Apartment\ApartmentRepository;
+use App\Repositories\Apartment\MysqlApartmentRepository;
+use App\Repositories\Reservation\MysqlReservationRepository;
+use App\Repositories\Reservation\ReservationRepository;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 
 class ApartmentAvailabilityService {
+
+    private ApartmentRepository $apartmentRepository;
+    private ReservationRepository $reservationRepository;
+
+    public function __construct(){
+
+        $this->apartmentRepository = new MysqlApartmentRepository();
+        $this->reservationRepository = new MysqlReservationRepository();
+    }
 
 
     public function execute(ApartmentAvailabilityRequest $request): ApartmentAvailabilityResponse
@@ -16,24 +28,12 @@ class ApartmentAvailabilityService {
         $selectedTo = Carbon::createFromFormat('Y-m-d', $request->getDateTo())->toDateString();
         $selectedDatesRange = CarbonPeriod::create($selectedFrom, $selectedTo);
 
-        $apartmentsQuery = Database::connection()
-            ->createQueryBuilder()
-            ->select('*')
-            ->from('apartments')
-            ->executeQuery()
-            ->fetchAllAssociative();
-
-        $reservationsQuery = Database::connection()
-            ->createQueryBuilder()
-            ->select('*')
-            ->from('reservations')
-            ->executeQuery()
-            ->fetchAllAssociative();
+        $allApartments = $this->apartmentRepository->getAllApartments();
+        $allReservations = $this->reservationRepository->getAllReservations();
 
         $availableId = [];
 
-        foreach ($apartmentsQuery as $apartment) {
-
+        foreach ($allApartments as $apartment) {
             $range = CarbonPeriod::create(
                 $apartment['available_from'], $apartment['available_to']);
 
@@ -42,7 +42,7 @@ class ApartmentAvailabilityService {
             }
         }
 
-        foreach ($reservationsQuery as $reservation) {
+        foreach ($allReservations as $reservation) {
             $range = CarbonPeriod::create(
                 $reservation['reservation_date_from'], $reservation['reservation_date_to']);
 
@@ -55,14 +55,7 @@ class ApartmentAvailabilityService {
         $availableApartments = [];
 
         foreach ($availableId as $id) {
-            $availableApartmentsQuery = Database::connection()
-                ->createQueryBuilder()
-                ->select('*')
-                ->from('apartments')
-                ->where('id = ?')
-                ->setParameter(0, $id)
-                ->executeQuery()
-                ->fetchAllAssociative();
+            $availableApartmentsQuery = $this->reservationRepository->getReservationsIfAvailable($id);
 
             foreach ($availableApartmentsQuery as $data) {
                 $availableApartments[] = new Apartment(

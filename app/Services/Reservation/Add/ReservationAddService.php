@@ -3,19 +3,26 @@
 namespace App\Services\Reservation\Add;
 
 use App\Database;
+use App\Models\Reservation;
+use App\Repositories\Reservation\MysqlReservationRepository;
+use App\Repositories\Reservation\ReservationRepository;
 use App\Services\Price\Calculate\PriceCalculateResponse;
 
 class ReservationAddService {
 
+    private ReservationRepository $reservationRepository;
+
+    public function __construct()
+    {
+        $this->reservationRepository = new MysqlReservationRepository();
+    }
+
     public function execute(ReservationAddRequest $request){
 
-        Database::connection()
-            ->insert('reservations', [
-                'apartment_id' => $request->getApartmentId(),
-                'user_id' => $request->getUserId(),
-                'reservation_date_from' => $request->getDateFrom(),
-                'reservation_date_to' => $request->getDateTo(),
-                'total_price' => $request->getTotalPrice()
-            ]);
+        $reservation = new Reservation($request->getUserId(), $request->getApartmentId(), '', '',
+        $request->getDateFrom(), $request->getDateTo(), $request->getTotalPrice());
+
+        $this->reservationRepository->add($reservation);
+
     }
 }
